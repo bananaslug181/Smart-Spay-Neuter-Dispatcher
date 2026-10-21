@@ -3,6 +3,8 @@ from google.cloud import datastore
 from flask import Flask, render_template
 from flask import Flask, render_template, request
 
+# references for API requests: https://canvas.oregonstate.edu/courses/2061616/pages/exploration-crud-operations-in-datastore?module_item_id=27019561
+
 app = Flask(__name__)
 
 client = datastore.Client()
