@@ -15,7 +15,7 @@ RESERVATIONS = 'reservations'
 USERS = 'users'
 REQUEST_MISSING_ATTRIBUTE = {"Error": "The request body is missing at least one of the required attributes"}
 APPOINTMENT_NOT_FOUND = {"Error": "No appointment with this appointment_id exists"}
-
+USER_NOT_FOUND = {"Error": "No user with this user_id exists"}
 
 @app.route("/")
 def index():
@@ -89,6 +89,86 @@ def delete_appointment(id):
         return APPOINTMENT_NOT_FOUND, 404
     client.delete(appointment_key)
     return appointment, 204
+
+############################### USERS ################################################
+# CREATE A USER
+@app.route('/' + USERS, methods=["POST"])
+def create_user():
+    content = request.get_json()
+    required_content = ['first_name', 'last_name', 'email', 'phone', 'address']
+    # make sure body has all the content before attempting to add
+    if body_has_content(content, required_content) is False:
+        return REQUEST_MISSING_ATTRIBUTE, 400
+    # make new key for database
+    new_key = client.key(USERS)
+    new_user = datastore.Entity(key=new_key)
+    new_user.update({
+        'first_name': content['first_name'],
+        'last_name': content['last_name'],
+        'email': content['email'],
+        'phone': content['phone'],
+        'address': content['address']
+    })
+    client.put(new_user)
+    new_user['id'] = new_user.key.id
+    return (new_user, 201)
+
+# GET A USER
+@app.route('/' + USERS + '/<int:id>', methods=["GET"])
+def get_user(id):
+    user_key = client.key(USERS, id)
+    users = client.get(user_key)
+    if users is None:
+        return USER_NOT_FOUND, 404
+    users['id'] = users.key.id
+    return users, 200
+
+# GET ALL USERS
+@app.route('/' + USERS, methods=["GET"])
+def get_users():
+    query = client.query(kind=USERS)
+    results = list(query.fetch())
+    for r in results:
+        r['id'] = r.key.id
+    return results, 200
+
+# EDIT A USER
+@app.route('/' + USERS + '/<int:id>', methods = ['PUT'])
+def edit_user(id):
+    content = request.get_json()
+    required_content = ['first_name', 'last_name', 'email', 'phone', 'address']
+    # make sure body has all the content before attempting to add
+    if body_has_content(content, required_content) is False:
+        return REQUEST_MISSING_ATTRIBUTE, 400
+    # get the user key
+    user_key = client.key(USERS, id)
+    user = client.get(user_key)
+    if user is None:
+        return USER_NOT_FOUND, 404
+    user.update({
+        'first_name': content['first_name'],
+        'last_name': content['last_name'],
+        'email': content['email'],
+        'phone': content['phone'],
+        'address': content['address']
+    })
+    client.put(user)
+    user['id'] = user.key.id
+    return (user, 200)
+
+# DELETE A USER
+@app.route('/' + USERS + '/<int:id>', methods = ['DELETE'])
+def delete_user(id):
+    user_key = client.key(USERS, id)
+    user = client.get(user_key)
+    # make sure it exists first
+    if user is None:
+        return USER_NOT_FOUND, 404
+    client.delete(user_key)
+    return user, 204
+    
+
+############################### HELPER FUNCTIONS #####################################
 
 def body_has_content(content, required_content):
     # MAKE SURE BODY IS NOT MISSING REQUIRED CONTENT
