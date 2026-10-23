@@ -167,6 +167,28 @@ def delete_user(id):
     client.delete(user_key)
     return user, 204
     
+############################### RESERVATIONS ########################################
+
+# Create Reservation
+@app.route('/' + RESERVATIONS, methods = ["POST"])
+def create_reservation():
+    content = request.get_json()
+    # make sure body has content before adding
+    if body_has_content(content) is False:
+        return REQUEST_MISSING_ATTRIBUTE, 400
+    new_key = client.key(RESERVATIONS)
+    new_reservation = datastore.Entity(key=new_key)
+    new_reservation.update({
+        'user_id': int(content['user_id']),
+        'clinic_id': int(content['clinic_id']),
+        'appointment_id': int(content['appointment_id']),
+        'patient_details': content['patient_details'],
+        'date': content['date'],
+        'time': content['time']
+    })
+    client.put(new_reservation)
+    new_reservation['id'] = new_reservation.key.id
+    return (new_reservation, 201)
 
 ############################### HELPER FUNCTIONS #####################################
 
