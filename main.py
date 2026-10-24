@@ -16,6 +16,7 @@ USERS = 'users'
 REQUEST_MISSING_ATTRIBUTE = {"Error": "The request body is missing at least one of the required attributes"}
 APPOINTMENT_NOT_FOUND = {"Error": "No appointment with this appointment_id exists"}
 USER_NOT_FOUND = {"Error": "No user with this user_id exists"}
+RESERVATION_NOT_FOUND = {"Error": "No reservation with this reservation_id exists"}
 
 @app.route("/")
 def index():
@@ -173,8 +174,9 @@ def delete_user(id):
 @app.route('/' + RESERVATIONS, methods = ["POST"])
 def create_reservation():
     content = request.get_json()
+    required_content = ['user_id', 'clinic_id', 'appointment_id', 'patient_details', 'date', 'time']
     # make sure body has content before adding
-    if body_has_content(content) is False:
+    if body_has_content(content, required_content) is False:
         return REQUEST_MISSING_ATTRIBUTE, 400
     new_key = client.key(RESERVATIONS)
     new_reservation = datastore.Entity(key=new_key)
@@ -189,6 +191,28 @@ def create_reservation():
     client.put(new_reservation)
     new_reservation['id'] = new_reservation.key.id
     return (new_reservation, 201)
+
+# GET A RESERVATION
+@app.route('/' + RESERVATIONS + '/<int:id>', methods=['GET'])
+def get_reservation(id):
+    reservation_key = client.key(RESERVATIONS, id)
+    reservation = client.get(reservation_key)
+    if reservation is None:
+        return RESERVATION_NOT_FOUND, 404
+    reservation['id'] = reservation.key.id
+    return reservation, 200
+
+# LIST A USER'S RESERVATIONS
+@app.route('/' + USERS + '/<int:user_id>/reservations', methods=['GET'])
+def list_users_reservations(user_id):
+    query = client.query(kind=RESERVATIONS)
+    query.add_filter('user_id', '=', user_id)
+    results = list(query.fetch())
+    for r in results:
+        r['id'] = r.key.id
+    return results, 200
+
+# GET A CLINIC'S RESERVATIONS
 
 ############################### HELPER FUNCTIONS #####################################
 
