@@ -17,6 +17,7 @@ REQUEST_MISSING_ATTRIBUTE = {"Error": "The request body is missing at least one 
 APPOINTMENT_NOT_FOUND = {"Error": "No appointment with this appointment_id exists"}
 USER_NOT_FOUND = {"Error": "No user with this user_id exists"}
 RESERVATION_NOT_FOUND = {"Error": "No reservation with this reservation_id exists"}
+CLINICS = 'clinics'
 
 @app.route("/")
 def index():
@@ -212,8 +213,17 @@ def list_users_reservations(user_id):
         r['id'] = r.key.id
     return results, 200
 
-# GET A CLINIC'S RESERVATIONS
+# LIST A CLINIC'S RESERVATIONS
+@app.route('/' + CLINICS + '/<int:clinic_id>/reservations', methods=['GET'])
+def list_clinics_reservations(clinic_id):
+    query = client.query(kind=RESERVATIONS)
+    query.add_filter('clinic_id', '=', clinic_id)
+    results = list(query.fetch())
+    for r in results:
+        r['id'] = r.key.id
+    return results, 200
 
+# left off here ^
 ############################### HELPER FUNCTIONS #####################################
 
 def body_has_content(content, required_content):
