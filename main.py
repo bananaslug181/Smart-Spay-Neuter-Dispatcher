@@ -61,7 +61,7 @@ def get_all_appointments():
 
 # EDIT AN APPOINTMENT
 @app.route('/' + APPOINTMENTS + '/<int:id>', methods=['PUT'])
-def edit_appointment(id):    
+def put_appointment(id):    
     content = request.get_json()
     appointment_key = client.key(APPOINTMENTS, id)
     appointment = client.get(appointment_key)
@@ -136,7 +136,7 @@ def get_users():
 
 # EDIT A USER
 @app.route('/' + USERS + '/<int:id>', methods = ['PUT'])
-def edit_user(id):
+def put_user(id):
     content = request.get_json()
     required_content = ['first_name', 'last_name', 'email', 'phone', 'address']
     # make sure body has all the content before attempting to add
@@ -203,6 +203,31 @@ def get_reservation(id):
     reservation['id'] = reservation.key.id
     return reservation, 200
 
+# EDIT A RESERVATION
+@app.route('/' + RESERVATIONS, methods = ["PUT"])
+def put_reservation():
+    content = request.get_json()
+    required_content = ['user_id', 'clinic_id', 'appointment_id', 'patient_details', 'date', 'time']
+    # make sure body has content before adding
+    if body_has_content(content, required_content) is False:
+        return REQUEST_MISSING_ATTRIBUTE, 400
+    reservation_key = client.key(RESERVATIONS)
+    reservation = datastore.Entity(key=reservation_key)
+    # make sure reservation exists before editing
+    if reservation is None:
+        return RESERVATION_NOT_FOUND, 404
+    reservation.update({
+        'user_id': int(content['user_id']),
+        'clinic_id': int(content['clinic_id']),
+        'appointment_id': int(content['appointment_id']),
+        'patient_details': content['patient_details'],
+        'date': content['date'],
+        'time': content['time']
+    })
+    client.put(reservation)
+    reservation['id'] = reservation.key.id
+    return (reservation, 200)
+
 # LIST A USER'S RESERVATIONS
 @app.route('/' + USERS + '/<int:user_id>/reservations', methods=['GET'])
 def list_users_reservations(user_id):
@@ -222,6 +247,17 @@ def list_clinics_reservations(clinic_id):
     for r in results:
         r['id'] = r.key.id
     return results, 200
+
+# DELETE A RESERVATION
+@app.route('/' + RESERVATIONS + '<int:id>', methods=["DELETE"])
+def delete_reservation(id):
+    reservation_key = client.key(RESERVATIONS, id)
+    reservation = datastore.Entity(key=reservation_key)
+    # make sure reservation exists before deleting
+    if reservation is None:
+        return (RESERVATION_NOT_FOUND, 404)
+    client.delete(reservation_key)
+    return reservation, 204
 
 # left off here ^
 ############################### HELPER FUNCTIONS #####################################
