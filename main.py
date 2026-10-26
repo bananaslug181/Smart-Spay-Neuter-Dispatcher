@@ -54,8 +54,8 @@ def get_appointment(id):
     return appointment, 200
 
 # GET ALL APPOINTMENTS
-@app.route('/' + APPOINTMENTS, methods=['GET'])
-def get_all_appointments():
+#@app.route('/' + APPOINTMENTS, methods=['GET'])
+#def get_all_appointments():
     # POINTLESS, WILL NEVER USE???
     pass
 
@@ -170,7 +170,6 @@ def delete_user(id):
     return user, 204
     
 ############################### RESERVATIONS ########################################
-
 # Create Reservation
 @app.route('/' + RESERVATIONS, methods = ["POST"])
 def create_reservation():
@@ -259,7 +258,6 @@ def delete_reservation(id):
     client.delete(reservation_key)
     return reservation, 204
 
-# left off here ^
 ############################### HELPER FUNCTIONS #####################################
 
 def body_has_content(content, required_content):

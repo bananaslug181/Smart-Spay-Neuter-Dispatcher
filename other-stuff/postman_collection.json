@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "cs406week4",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "{{app_url}}"
+    },
+    {
+      "url": ""
+    }
+  ],
+  "paths": {
+    "/appointments": {
+      "post": {
+        "summary": "create appointment",
+        "responses": {},
+        "tags": [
+          "Create an Appointment"
+        ]
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "get appointment",
+        "responses": {},
+        "tags": [
+          "Get an Appointment"
+        ]
+      }
+    },
+    "/appointments/{appointment_id_1}": {
+      "put": {
+        "summary": "edit appointment",
+        "responses": {},
+        "tags": [
+          "Edit an Appointment"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clinic_id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "example": {
+                "clinic_id": "{{clinic_id_2}}",
+                "date": "2026-10-20"
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "appointment_id_1",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "{{appointment_id_1}}"
+        }
+      ]
+    },
+    "/users": {
+      "post": {
+        "summary": "New Request",
+        "responses": {},
+        "tags": [
+          "Create a User"
+        ]
+      }
+    },
+    "/users/{clinic_id_1}": {
+      "put": {
+        "summary": "New Request",
+        "responses": {},
+        "tags": [
+          "Edit a User"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "clinic_id_1",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "{{clinic_id_1}}"
+        }
+      ]
+    },
+    "/reservations": {
+      "post": {
+        "summary": "create reservation",
+        "responses": {},
+        "tags": [
+          "Create a Reservation"
+        ]
+      },
+      "put": {
+        "summary": "edit reservation",
+        "responses": {},
+        "tags": [
+          "Edit a Reservation"
+        ]
+      }
+    },
+    "/users/{user_id_1}/reservations": {
+      "get": {
+        "summary": "list user's reservations",
+        "responses": {},
+        "tags": [
+          "List a User's Reservation"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "user_id_1",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "{{user_id_1}}"
+        }
+      ]
+    }
+  }
+}
