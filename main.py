@@ -2,10 +2,12 @@ from datetime import datetime
 from google.cloud import datastore
 from flask import Flask, render_template
 from flask import Flask, render_template, request
-
+from flask import Flask
+from flask_cors import CORS
 # references for API requests: https://canvas.oregonstate.edu/courses/2061616/pages/exploration-crud-operations-in-datastore?module_item_id=27019561
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 client = datastore.Client()
 

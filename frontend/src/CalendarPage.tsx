@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-const ProfileView = () => {
+const CalendarView = () => {
     const navigate = useNavigate()
 
     const userName = "Jessica"
@@ -31,4 +31,4 @@ const ProfileView = () => {
     )
 }
 
-export default ProfileView
+export default CalendarView
