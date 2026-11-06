@@ -1,5 +1,6 @@
-import {UserData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher';
+import {UserData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher'; 
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 /////////////////////// PROFILE ROUTES ////////////////////////////
 
 // add user
@@ -20,7 +21,7 @@ export const editUser = async (userID: string | number): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/user`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(user),
+    body: JSON.stringify(userID),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to edit user' }));
@@ -30,7 +31,7 @@ export const editUser = async (userID: string | number): Promise<void> => {
 
 // get user
 export const getUser = async (userID: string | number): Promise<UserData> => {
-  const response = await fetch(`${API_BASE_URL}/user/${userId}`);
+  const response = await fetch(`${API_BASE_URL}/user/${userID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);
@@ -54,7 +55,7 @@ export const addAppointment = async (user: AppointmentData): Promise<void> => {
 };
 
 // get appointment
-export const getAppointment = async (user: AppointmentData): Promise<AppointmentData> => {
+export const getAppointment = async (appointmentID: string | number): Promise<AppointmentData> => {
   const response = await fetch(`${API_BASE_URL}/appointments/${appointmentID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get appointment' }));
@@ -79,7 +80,7 @@ export const addReservation = async (user: ReservationData): Promise<void> => {
 };
 
 // get reservation
-export const getReservation = async (user: ReservationData): Promise<ReservationData> => {
+export const getReservation = async (reservationID: string | number): Promise<ReservationData> => {
   const response = await fetch(`${API_BASE_URL}/appointments/${reservationID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get reservation' }));

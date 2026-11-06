@@ -1,26 +1,33 @@
 import { editUser } from './services/dispatcherAPI'
 import { addUser } from './services/dispatcherAPI'
 import {getUser} from './services/dispatcherAPI'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { UserData } from './types/dispatcher'
+import './index.css'
 
 function UserPage() {
 
   const [formData, setFormData] = useState<UserData>({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     address: '',
     phone: ''
   });
 
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
+  // get the user ID from the URL
+  const {userID} = useParams<{userID: string}>();
+
+  const [first_name, setFirstName] = useState<string>('');
+  const [last_name, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
 
   // set the states
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
@@ -48,38 +55,36 @@ function UserPage() {
       };
     
   // GET PROFILE
-  useEffect(() => {
   // reference: https://blog.logrocket.com/useeffect-react-hook-complete-guide/ 
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        // get from the backend
-        const data: UserData = await getUser(payload);
-        // put the data on the page MAKE SURE DATA EXISTS, if no data then go to edit/add user
-        if ((data.firstName || data.lastName) && data.status === 200) {
-          setFirstName(data.firstName);
-          setLastName(data.lastName);
-          setPhone(data.phone);
-          setEmail(data.email);
-          setPhone(data.email);
-        }
-        else {
-          // no data or 200 failure, set to edit/make user mode
-          setIsEditing(true);
-        }
-      } catch (error) {
-        setError("Failed to get user user.")
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // get from the backend
+      const data: UserData = await getUser(userID);
+      // put the data on the page MAKE SURE DATA EXISTS, if no data then go to edit/add user
+      if ((data.first_name || data.last_name)) {
+        setFirstName(data.first_name);
+        setLastName(data.last_name);
+        setPhone(data.phone);
+        setEmail(data.email);
+        setAddress(data.address);
       }
-      finally {
-        setLoading(false)
-      };
-
-      useEffect(() => {
-        fetchUser();
-      })
+      else {
+        // no data or 200 failure, set to edit/make user mode
+        setIsEditing(true);
+      }
+    } catch (error) {
+      setError("Failed to get user user.")
     }
-  }, []);
+    finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+      fetchUser();
+    }, []);
 
   // ADD USER
   const handleUpload = async (e: React.FormEvent) => {
@@ -87,7 +92,7 @@ function UserPage() {
     setError(null);
     setSuccess(false);
 
-    const payload: UserData = {name, phone, email, address}
+    const payload: UserData = {first_name, last_name, phone, email, address}
 
     try {
       // send the to the backend
@@ -103,44 +108,34 @@ function UserPage() {
   };
   
   return (
+
+    // reference: https://www.w3schools.com/css/css_navbar.asp 
     <>
+    <nav className="navbar">
+      <ul className="nav-links">
+        <li><Link to="/">Day View</Link></li>
+        <li><Link to="/calendar">Calendar</Link></li>
+        <li><Link to="/user">Profile</Link></li>
+      </ul>
+    </nav>
+
       {!isEditing ? (
         // VIEW PROFILE
         <div style={{display: 'flex'}}>
           <h1>View Your Profile</h1>
           <div>
-              <input 
-                type="text" 
-                value={firstName} 
-              />
-              <p>First Name: {firstName}</p>
+              <p>First Name: {first_name}</p>
           </div>
           <div>
-              <input 
-                type="text" 
-                value={lastName} 
-              />
-              <p>Last Name: {lastName}</p>
+              <p>Last Name: {last_name}</p>
           </div>
           <div>
-            <input 
-              type="text" 
-              value={phone} 
-            />
             <p>Phone: {phone}</p>
         </div>
           <div>
-              <input 
-                type="text" 
-                value={email} 
-              />
               <p>Email: {email}</p>
           </div>
           <div>
-              <input 
-                type="text" 
-                value={address} 
-              />
               <p>Address: {address}</p>
           </div>
         <button type="submit" onClick={() => setIsEditing(true)}>
@@ -155,20 +150,20 @@ function UserPage() {
           <div>
               <input 
                 type="text" 
-                value={firstName} 
+                value={first_name} 
                 onChange={handleFirstNameChange} 
                 placeholder="Enter your first name" 
               />
-              <p>First Name: {firstName}</p>
+              <p>First Name: {first_name}</p>
           </div>
           <div>
             <input 
               type="text" 
-              value={lastName} 
+              value={last_name} 
               onChange={handleLastNameChange} 
               placeholder="Enter your last name" 
             />
-            <p>Last Name: {lastName}</p>
+            <p>Last Name: {last_name}</p>
           </div>
           <div>
               <input 
@@ -204,5 +199,6 @@ function UserPage() {
       }
     </>
   );
-};
+}
+
 export default UserPage;

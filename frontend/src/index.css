@@ -1,11 +1,11 @@
 
-/*:root {
+:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.2;
   font-weight: 500;
   color-scheme: light dark;
-  color: rgba(0, 247, 255, 0.87);
-  background-color: #fde4e4;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #eaffff;
 }
 a:hover {
   color: #e2f253;
@@ -27,6 +27,55 @@ body {
   min-height: 200vh;
   min-width: 400px;
 }
+
+.navbar {
+  font-family: monaco;
+  border-radius: 2px;
+  margin: 0;
+  padding: 0;
+  color:rgb(177, 225, 234);
+  align-items: center;
+  justify-content: left;
+  text-align: left;
+  height:45px;
+  list-style-type: none;
+  cursor: pointer;
+}
+
+li{
+float:left;
+}
+
+li a{
+display: block;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-family: monaco;
+}
+
+li a:hover:not(.active) {
+background-color: #111;
+}
+
+ul{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+.navbarButton:hover{
+  font-family: monaco;
+  transition: all linear .5s;
+  color:rgb(255, 255, 255);
+  border-radius: 5%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
 button {
   border: 1px solid transparent;
   border-radius: 10px;
@@ -45,4 +94,3 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-  */

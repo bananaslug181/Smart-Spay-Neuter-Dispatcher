@@ -18,12 +18,6 @@ const DayView = () => {
                     <h1>Day View</h1>
                 </header>
 
-                <nav>
-                    <a href="day.html">Day</a>
-                    <a href="calendar.html">Calendar</a>
-                    <a href="profile.html">Profile</a>
-                </nav>
-
                 <h2>Schedule Appointment</h2>
 
 
