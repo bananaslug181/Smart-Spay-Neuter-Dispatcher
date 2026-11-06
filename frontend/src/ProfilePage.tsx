@@ -1,96 +1,102 @@
-import { saveProfile } from './services/dispatcherAPI';
+import { editProfile } from './services/dispatcherAPI'
+import { addProfile } from './services/dispatcherAPI'
 import { useState } from 'react';
-import { UserData } from './types/dispatcher';
+import { ProfileData } from './types/dispatcher'
+
+// credit: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/
 
 function ProfilePage() {
-  const [formData, setFormData] = useState<UserData>({
+
+  const [formData, setFormData] = useState<ProfileData>({
     name: '',
     email: '',
-    role: 'client'
-});
-  const [saving, setSaving] = useState(false);
+    address: '',
+    phone: ''
+  });
+
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-    setSaving(true);
+  const handleNameChange = 
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+          setName(e.target.value);
+      };
+  const handleAddressChange = 
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+          setAddress(e.target.value);
+      };
+  const handlePhoneChange = 
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+          setPhone(e.target.value);
+      };
+  const handleEmailChange = 
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+          setEmail(e.target.value);
+      };
+    
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault(); // prevent page reloading
     setError(null);
     setSuccess(false);
 
-    const handleSubmit = async (data: UserData) => {
-      setSaving(true);
-      setError(null);
-      setSuccess(false);
+    const payload: ProfileData = {name, phone, email, address}
 
     try {
-      await saveProfile(data);
+      // send the to the backend
+      await addProfile(payload);
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save profile');
-    } finally {
-      setSaving(false);
+      setError("Failed to upload profile data.");
     }
   };
-
+  
   return (
-    <div className="user-details-page">
-      {error && (
-        <div className="error-banner">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="success-banner">
-          Profile saved successfully!
-        </div>
-      )}
-      {saving && (
-        <div className="saving-overlay">
-          Saving...
-        </div>
-      )}
-      <style>{`
-        .profile-details-page {
-          min-height: 100vh;
-          background-color: #f5f5f5;
-          padding: 2rem 1rem;
-        }
-        .error-banner {
-          max-width: 900px;
-          margin: 0 auto 1rem auto;
-          padding: 1rem;
-          background-color: #1693b3;
-          border: 1px solid #88101c;
-          border-radius: 5px;
-          color: #07ee41;
-          text-align: center;
-        }
-        .saving-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(245, 166, 166, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.0rem;
-          color: #0c1d6d;
-          z-index: 1000;
-        }
-                  .success-banner {
-          max-width: 900px;
-          margin: 0 auto 1rem auto;
-          padding: 1rem;
-          background-color: #9807f8;
-          border: 1px solid #00bd2c;
-          border-radius: 5px;
-          color: #9500cf;
-          text-align: center;
-        }
-      `}</style>
+    <>
+    <form onSubmit={handleUpload}>
+      <div>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={handleNameChange} 
+            placeholder="Enter your name" 
+          />
+          <p>Name: {name}</p>
+      </div>
+      <div>
+          <input 
+            type="text" 
+            value={email} 
+            onChange={handleEmailChange} 
+            placeholder="Enter your email" 
+          />
+          <p>Email: {email}</p>
+      </div>
+      <div>
+          <input 
+            type="text" 
+            value={address} 
+            onChange={handleAddressChange} 
+            placeholder="Enter your address" 
+          />
+          <p>Name: {address}</p>
+      </div>
+    <div>
+        <input 
+          type="text" 
+          value={phone} 
+          onChange={handlePhoneChange} 
+          placeholder="Enter your phone" 
+        />
+        <p>Phone: {phone}</p>
     </div>
+    <button type="submit">Save Profile</button>
+    </form>
+  </>
   );
-}
-
+};
 export default ProfilePage;

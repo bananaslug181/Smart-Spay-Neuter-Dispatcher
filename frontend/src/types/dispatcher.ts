@@ -4,11 +4,12 @@ export interface AppointmentData {
   date: string;
 }
 
-export interface UserData {
+export interface ProfileData {
   id?: string;
   name: string;
   email: string;
-  role: 'client' | 'clinic';
+  address: string;
+  phone: string;
 }
 
 export interface ReservationData {

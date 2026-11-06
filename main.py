@@ -23,7 +23,7 @@ CLINICS = 'clinics'
 
 @app.route("/")
 def index():
-    return "Please navigate to /appointments to use this API"
+    return "Please navigate to /profile to use this API"
 
 ############################## APPOINTMENTS ################################################
 # CREATE AN APPOINTMENT
