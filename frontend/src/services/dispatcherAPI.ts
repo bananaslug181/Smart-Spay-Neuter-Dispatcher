@@ -1,38 +1,38 @@
-import {ProfileData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher';
+import {UserData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher';
 
 /////////////////////// PROFILE ROUTES ////////////////////////////
 
-// add profile
-export const addProfile = async (profile: ProfileData): Promise<void> => {
-  const response = await fetch('{API_BASE_URL}/profile', {
+// add user
+export const addUser = async (user: UserData): Promise<void> => {
+  const response = await fetch('{API_BASE_URL}/user', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(profile),
+    body: JSON.stringify(user),
   });
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to save profile' }));
+    const error = await response.json().catch(() => ({ detail: 'Failed to save user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);
   }
 };
 
-// edit profile
-export const editProfile = async (userID: string | number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
+// edit user
+export const editUser = async (userID: string | number): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/user`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(profile),
+    body: JSON.stringify(user),
   });
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to edit profile' }));
+    const error = await response.json().catch(() => ({ detail: 'Failed to edit user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);
   }
 };
 
-// get profile
-export const getProfile = async (userID: string | number): Promise<ProfileData> => {
-  const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+// get user
+export const getUser = async (userID: string | number): Promise<UserData> => {
+  const response = await fetch(`${API_BASE_URL}/user/${userId}`);
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to get profile' }));
+    const error = await response.json().catch(() => ({ detail: 'Failed to get user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);
   }
   return response.json()
@@ -41,11 +41,11 @@ export const getProfile = async (userID: string | number): Promise<ProfileData> 
 ////////////////////// APPOINTMENT ROUTES //////////////////////////////
 
 // add appointment
-export const addAppointment = async (profile: AppointmentData): Promise<void> => {
+export const addAppointment = async (user: AppointmentData): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/appointments`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(profile),
+    body: JSON.stringify(user),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to add an appointment' }));
@@ -54,7 +54,7 @@ export const addAppointment = async (profile: AppointmentData): Promise<void> =>
 };
 
 // get appointment
-export const getAppointment = async (profile: AppointmentData): Promise<AppointmentData> => {
+export const getAppointment = async (user: AppointmentData): Promise<AppointmentData> => {
   const response = await fetch(`${API_BASE_URL}/appointments/${appointmentID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get appointment' }));
@@ -66,11 +66,11 @@ export const getAppointment = async (profile: AppointmentData): Promise<Appointm
 /////////////////////////// RESERVATION ROUTES ////////////////////////////
 
 // add reservation
-export const addReservation = async (profile: ReservationData): Promise<void> => {
+export const addReservation = async (user: ReservationData): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/reservations`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(profile),
+    body: JSON.stringify(user),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to add a reservation' }));
@@ -79,7 +79,7 @@ export const addReservation = async (profile: ReservationData): Promise<void> =>
 };
 
 // get reservation
-export const getReservation = async (profile: ReservationData): Promise<ReservationData> => {
+export const getReservation = async (user: ReservationData): Promise<ReservationData> => {
   const response = await fetch(`${API_BASE_URL}/appointments/${reservationID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get reservation' }));

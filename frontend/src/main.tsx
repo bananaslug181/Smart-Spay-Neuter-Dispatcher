@@ -2,10 +2,10 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import CalendarView from './CalendarPage'
-import ProfileView from './ProfilePage'
+import UserView from './UserPage'
 import DayView from './DayPage'
 
-//import { ProfileEditorPopup } from './components'
+//import { userEditorPopup } from './components'
 //import './index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<DayView />} />
-        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/user" element={<UserView />} />
         <Route path="/calendar" element={<CalendarView />} />
       </Routes>
     </BrowserRouter>
