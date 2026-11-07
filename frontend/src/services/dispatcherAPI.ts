@@ -1,11 +1,11 @@
 import {UserData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher'; 
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VITE_API_URL?: string } }).env.VITE_API_URL || 'http://localhost:8001';
 /////////////////////// PROFILE ROUTES ////////////////////////////
 
 // add user
 export const addUser = async (user: UserData): Promise<void> => {
-  const response = await fetch('{API_BASE_URL}/user', {
+  const response = await fetch(`{API_BASE_URL}/users`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(user),
@@ -18,7 +18,7 @@ export const addUser = async (user: UserData): Promise<void> => {
 
 // edit user
 export const editUser = async (userID: string | number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/user`, {
+  const response = await fetch(`${API_BASE_URL}/users/${userID}`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(userID),
@@ -31,7 +31,8 @@ export const editUser = async (userID: string | number): Promise<void> => {
 
 // get user
 export const getUser = async (userID: string | number): Promise<UserData> => {
-  const response = await fetch(`${API_BASE_URL}/user/${userID}`);
+  const response = await fetch(`${API_BASE_URL}/users/${userID}`);
+  console.log("USER ID:", userID)
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);

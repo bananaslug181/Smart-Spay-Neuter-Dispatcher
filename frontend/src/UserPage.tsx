@@ -61,7 +61,9 @@ function UserPage() {
       setLoading(true);
       setError(null);
       // get from the backend
-      const data: UserData = await getUser(userID);
+      const currentUserID = userID!; // never undefined
+      if (!currentUserID) return; // if no user id don't bother getting user
+      const data: UserData = await getUser(currentUserID);
       // put the data on the page MAKE SURE DATA EXISTS, if no data then go to edit/add user
       if ((data.first_name || data.last_name)) {
         setFirstName(data.first_name);
@@ -86,7 +88,7 @@ function UserPage() {
       fetchUser();
     }, []);
 
-  // ADD USER
+  // EDIT USER
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault(); // prevent page reloading
     setError(null);
@@ -94,6 +96,16 @@ function UserPage() {
 
     const payload: UserData = {first_name, last_name, phone, email, address}
 
+    // LEFT OFF:
+    //
+    //
+    //
+    // MAKE THIS EDIT USER INSTEAD! SINCE IT WOULD NEVER POST A USER WHEN ON THE EDIT USER PAGE
+    // SINCE UR EDITING A USER THAT ALREADY EXISTS
+    //
+    //
+    //
+    
     try {
       // send the to the backend
       await addUser(payload);
@@ -115,7 +127,7 @@ function UserPage() {
       <ul className="nav-links">
         <li><Link to="/">Day View</Link></li>
         <li><Link to="/calendar">Calendar</Link></li>
-        <li><Link to="/user">Profile</Link></li>
+        <li><Link to="/users">Profile</Link></li>
       </ul>
     </nav>
 
@@ -192,7 +204,7 @@ function UserPage() {
             />
             <p>Phone: {phone}</p>
         </div>
-        <button type="submit" onClick={() => setIsEditing(false)}>
+        <button type="submit">
             Submit</button>
         </form>
         )
@@ -200,5 +212,4 @@ function UserPage() {
     </>
   );
 }
-
 export default UserPage;

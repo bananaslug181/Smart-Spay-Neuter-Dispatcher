@@ -13,7 +13,8 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<DayView />} />
-        <Route path="/user" element={<UserView />} />
+        <Route path="/users" element={<UserView />} />
+        <Route path="/users/:userID" element={<UserView />} />
         <Route path="/calendar" element={<CalendarView />} />
       </Routes>
     </BrowserRouter>
