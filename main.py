@@ -125,6 +125,7 @@ def get_user(id):
     if users is None:
         return USER_NOT_FOUND, 404
     users['id'] = users.key.id
+    print(f"USER ID !!!!!!!!!!!!!!: {users.key.id}")
     return users, 200
 
 # GET ALL USERS
