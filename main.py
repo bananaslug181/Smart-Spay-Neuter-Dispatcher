@@ -9,6 +9,10 @@ from authlib.integrations.flask_client import OAuth
 from flask import url_for, redirect
 import os # for using env stuff
 from dotenv import load_dotenv # enviornment stuff
+from flask import session
+from flask import g
+from datetime import datetime, timedelta
+
 
 # constants to help with debugging in case misspell, it doesn't give route error
 APPOINTMENTS = 'appointments'
@@ -22,15 +26,18 @@ CLINICS = 'clinics'
 
 app = Flask(__name__)
 # load the key and ID from the enviornment
+load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 secret_key = os.getenv("CLIENT_SECRET")
 app.secret_key = os.getenv("APP-SECRET_KEY") # ?? just random?
-load_dotenv()
 
 CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 client = datastore.Client()
 
+from flask import session
+
+app.config["SECRET_KEY"] = os.environ["APP_SECRET_KEY"]
 
 # credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 oauth = OAuth(app)
@@ -46,6 +53,20 @@ oauth.register(
 def index():
     return "Please navigate to /calendar to use this API"
 
+# credit: https://www.itflashcards.com/cheatsheets/flask/
+@app.before_request
+def load_user():
+    user_id = session.get("user")
+    g.user = user_id
+
+# credit: https://www.itflashcards.com/cheatsheets/flask/
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_NAME="myapp_session",
+)
+
 ####################################### OAUTH #####################################################
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 @app.route('/login')
@@ -58,13 +79,18 @@ def login():
 def authorize():
     token = oauth.google.authorize_access_token()
     userinfo = token['userinfo']
-    session['user'] = userinfo
+    session['user_id'] = userinfo['sub'] # sub = userid?
     # do something with the token and profile
-    # put the profile in the datastore (next 3 lines is what i added)
-    # TODO- only do if they arent already in
-    new_key = client.key('profile', userinfo['sub'])
-    new_profile = datastore.Entity(key=new_key)
-    client.put(new_profile)
+    # only make new user if arent already registered?
+    saved_user_key = client.key(USERS, session['user_id'])
+    if saved_user_key is None:
+        new_key = client.key(USERS, userinfo['sub'])
+        new_profile = datastore.Entity(key=new_key)
+        client.put(new_profile)
+    # now whether or not user exists or not, gather their info from database?
+    session['user_email'] = userinfo['email']
+    session['first_name'] = userinfo['first_name']
+    session['last_name'] = userinfo['last_name']
     return redirect('http://localhost:5173/day') # redirect to the dayView page # TODO turn this into an env variable
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
@@ -72,6 +98,11 @@ def authorize():
 def logout():
     # Retrieve the ID token you stored during login
     id_token = session.pop('id_token', None)
+    session.pop("user_id", None)
+    session.clear()
+    # credit: https://www.itflashcards.com/cheatsheets/flask/ 
+    session.permanent = True                       # respects PERMANENT_SESSION_LIFETIME
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
     return oauth.google.logout_redirect(
         post_logout_redirect_uri=url_for('logged_out', _external=True),
         id_token_hint=id_token,
