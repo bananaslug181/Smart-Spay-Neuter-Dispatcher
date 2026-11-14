@@ -1,9 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\static",
-    "\\templates"
+    "\\frontend",
+    "\\frontend\\src",
+    "\\frontend\\src\\services",
+    "\\frontend\\src\\types"
   ],
-  "SelectedNode": "\\templates",
+  "SelectedNode": "\\frontend\\src\\services\\dispatcherAPI.ts",
   "PreviewInSolutionExplorer": false
 }

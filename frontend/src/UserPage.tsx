@@ -78,7 +78,6 @@ function UserPage() {
   };
   
   return (
-
     // reference: https://www.w3schools.com/css/css_navbar.asp 
     <>
     <nav className="navbar">
@@ -89,9 +88,8 @@ function UserPage() {
       </ul>
     </nav>
 
-
     <form onSubmit={handleUpload}>
-      <h1>Edit Your Profile</h1>
+      <h1>Create Your Profile</h1>
       <div>
           <input 
             type="text" 
@@ -140,7 +138,6 @@ function UserPage() {
     <button type="submit">
         Submit</button>
     </form>
-
     </>
   );
 }

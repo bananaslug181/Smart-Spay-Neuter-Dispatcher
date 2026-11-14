@@ -4,14 +4,13 @@ from flask import Flask, render_template
 from flask import Flask, render_template, request
 from flask import Flask
 from flask_cors import CORS
-# references for API requests: https://canvas.oregonstate.edu/courses/2061616/pages/exploration-crud-operations-in-datastore?module_item_id=27019561
+from flask import jsonify, session
+from authlib.integrations.flask_client import OAuth
+from flask import url_for, redirect
+import os # for using env stuff
+from dotenv import load_dotenv # enviornment stuff
 
-app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
-
-client = datastore.Client()
-
-# constants to help with debugging in case I misspell, it doesn't give me a route error
+# constants to help with debugging in case misspell, it doesn't give route error
 APPOINTMENTS = 'appointments'
 RESERVATIONS = 'reservations'
 USERS = 'users'
@@ -21,10 +20,71 @@ USER_NOT_FOUND = {"Error": "No user with this user_id exists"}
 RESERVATION_NOT_FOUND = {"Error": "No reservation with this reservation_id exists"}
 CLINICS = 'clinics'
 
+app = Flask(__name__)
+# load the key and ID from the enviornment
+client_id = os.getenv("CLIENT_ID")
+secret_key = os.getenv("CLIENT_SECRET")
+app.secret_key = os.getenv("APP-SECRET_KEY") # ?? just random?
+load_dotenv()
+
+CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
+
+client = datastore.Client()
+
+
+# credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
+oauth = OAuth(app)
+oauth.register(
+    'google',
+    client_id = client_id,
+    client_secret = secret_key,
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid profile email'}
+)
+
 @app.route("/")
 def index():
     return "Please navigate to /calendar to use this API"
 
+####################################### OAUTH #####################################################
+# credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
+@app.route('/login')
+def login():
+    redirect_uri = url_for('authorize', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+# credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
+@app.route('/authorize')
+def authorize():
+    token = oauth.google.authorize_access_token()
+    userinfo = token['userinfo']
+    session['user'] = userinfo
+    # do something with the token and profile
+    # put the profile in the datastore (next 3 lines is what i added)
+    # TODO- only do if they arent already in
+    new_key = client.key('profile', userinfo['sub'])
+    new_profile = datastore.Entity(key=new_key)
+    client.put(new_profile)
+    return redirect('http://localhost:5173/day') # redirect to the dayView page # TODO turn this into an env variable
+
+# credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
+@app.route('/logout')
+def logout():
+    # Retrieve the ID token you stored during login
+    id_token = session.pop('id_token', None)
+    return oauth.google.logout_redirect(
+        post_logout_redirect_uri=url_for('logged_out', _external=True),
+        id_token_hint=id_token,
+    )
+
+# credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
+@app.route('/logged-out')
+def logged_out():
+    state_data = oauth.google.validate_logout_response()
+    return 'You have been logged out.'
+
+
+# references for following API requests: https://canvas.oregonstate.edu/courses/2061616/pages/exploration-crud-operations-in-datastore?module_item_id=27019561
 ############################## APPOINTMENTS ################################################
 # CREATE AN APPOINTMENT
 @app.route('/' + APPOINTMENTS, methods=["POST"])
@@ -115,6 +175,7 @@ def create_user():
     })
     client.put(new_user)
     new_user['id'] = new_user.key.id
+    print(f"INSIDE CREATE A USER FUNCTION!!!!!!!!!!!!!!!!!!!!! id: {new_user['id']}\n")
     return (new_user, 201)
 
 # GET A USER

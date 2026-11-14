@@ -5,16 +5,17 @@ const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VIT
 
 // add user
 export const addUser = async (user: UserData): Promise<UserData> => {
-  const response = await fetch(`{API_BASE_URL}/users`, {
+  const response = await fetch(`${API_BASE_URL}/users`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(user),
   });
-  console.log("INSIDE ADD USER IN dispatcherapi.ts")
+  console.log("INSIDE ADD USER IN dispatcherapi.ts: " + response)
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to save user' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);
   }
+  console.log("USER ID: " + user['id'])
   return response.json(); // return the data
 };
 
@@ -43,7 +44,6 @@ export const getUser = async (userID: string | number): Promise<UserData> => {
 };
 
 ////////////////////// APPOINTMENT ROUTES //////////////////////////////
-
 // add appointment
 export const addAppointment = async (user: AppointmentData): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/appointments`, {
