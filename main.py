@@ -12,7 +12,7 @@ from dotenv import load_dotenv # enviornment stuff
 from flask import session
 from flask import g
 from datetime import datetime, timedelta
-
+from flask import Flask, jsonify, render_template, request
 
 # constants to help with debugging in case misspell, it doesn't give route error
 APPOINTMENTS = 'appointments'
@@ -31,7 +31,10 @@ client_id = os.getenv("CLIENT_ID")
 secret_key = os.getenv("CLIENT_SECRET")
 app.secret_key = os.getenv("APP-SECRET_KEY") # ?? just random?
 
-CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
+
+CORS(app, 
+     origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+     supports_credentials=True)
 
 client = datastore.Client()
 
@@ -51,7 +54,7 @@ oauth.register(
 
 @app.route("/")
 def index():
-    return "Please navigate to /calendar to use this API"
+    return "Please navigate to /login to use this API"
 
 # credit: https://www.itflashcards.com/cheatsheets/flask/
 @app.before_request
@@ -61,7 +64,7 @@ def load_user():
 
 # credit: https://www.itflashcards.com/cheatsheets/flask/
 app.config.update(
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=False, # TODO change back to true when not local
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_NAME="myapp_session",
@@ -73,6 +76,33 @@ app.config.update(
 def login():
     redirect_uri = url_for('authorize', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
+
+# credit: https://testdriven.io/blog/flask-spa-auth/ 
+@app.route("/api/data", methods=["GET"])
+#@login_required
+def user_data():
+    user = session.get('user_id')
+    #if user:
+    return jsonify(
+        {"first_name": user["first_name"],
+        "last_name": user['last_name'],
+        'email': user['email']
+        })
+    #return redirect('http://localhost:5173/login') # no user, log in instead?
+
+# credit: https://testdriven.io/blog/flask-spa-auth/ 
+@app.route("/api/getsession")
+def check_session():
+    if session.get('user_id'):
+        return jsonify({"login": True})
+    return jsonify({"login": False})
+
+# get current user https://testdriven.io/blog/flask-spa-auth/ 
+# def get_user(user_id: int):
+#    for user in users:
+#        if int(user["id"]) == int(user_id):
+#            return user
+#    return None
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 @app.route('/authorize')
@@ -89,23 +119,24 @@ def authorize():
         client.put(new_profile)
     # now whether or not user exists or not, gather their info from database?
     session['user_email'] = userinfo['email']
-    session['first_name'] = userinfo['first_name']
-    session['last_name'] = userinfo['last_name']
-    return redirect('http://localhost:5173/day') # redirect to the dayView page # TODO turn this into an env variable
+    session['first_name'] = userinfo.get('given_name')
+    session['last_name'] = userinfo.get('family_name')
+    return redirect('http://localhost:5173/day') # redirect to the dayView page, TODO turn this into an env variable
+
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 @app.route('/logout')
+#@login_required
 def logout():
     # Retrieve the ID token you stored during login
-    id_token = session.pop('id_token', None)
-    session.pop("user_id", None)
+    #id_token = session.pop('id_token', None)
+    #session.pop("user_id", None)
     session.clear()
     # credit: https://www.itflashcards.com/cheatsheets/flask/ 
     session.permanent = True                       # respects PERMANENT_SESSION_LIFETIME
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
-    return oauth.google.logout_redirect(
-        post_logout_redirect_uri=url_for('logged_out', _external=True),
-        id_token_hint=id_token,
+    #app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+    return redirect(
+        'http://localhost:5173/login' # TODO TURN THIS INTO A ENV VALUE
     )
 
 # credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html

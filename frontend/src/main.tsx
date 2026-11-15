@@ -14,8 +14,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/day" element={<DayView />} />
-        <Route path="/users" element={<UserView />} />
-        <Route path="/users/:userID" element={<UserView />} />
+        <Route path="/profile" element={<UserView />} />
         <Route path="/calendar" element={<CalendarView />} />
         <Route path="/login" element={<LoginView />} />
       </Routes>

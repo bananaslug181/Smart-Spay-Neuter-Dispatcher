@@ -1,6 +1,9 @@
 import {UserData, ReservationData, AppointmentData, PatientDetails} from '../types/dispatcher'; 
+import {useEffect} from 'react';
 
 const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VITE_API_URL?: string } }).env.VITE_API_URL || 'http://localhost:8001';
+
+
 /////////////////////// PROFILE ROUTES ////////////////////////////
 
 // add user
@@ -32,16 +35,30 @@ export const editUser = async (userID: string | number): Promise<void> => {
   }
 };
 
-// get user
-export const getUser = async (userID: string | number): Promise<UserData> => {
-  const response = await fetch(`${API_BASE_URL}/users/${userID}`);
-  console.log("USER ID:", userID)
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to get user' }));
-    throw new Error(error.detail || `Error: ${response.statusText}`);
-  }
-  return response.json()
-};
+// get user, credit: https://testdriven.io/blog/flask-spa-auth/
+export const getUser = () => {
+  return fetch(`${API_BASE_URL}/api/data`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      //"X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+  })
+}
+
+//export const getUser = async (userID: string | number): Promise<UserData> => {
+  //const response = await fetch(`${API_BASE_URL}/users/${userID}`);
+ // const response = await fetch(`${API_BASE_URL}/data`, {
+   //   credentials: "include",
+//    })
+//  console.log("USER ID:", userID)
+//  if (!response.ok) {
+//    const error = await response.json().catch(() => ({ detail: 'Failed to get user' }));
+//    throw new Error(error.detail || `Error: ${response.statusText}`);
+//  }
+//  return response.json()
+//};
 
 ////////////////////// APPOINTMENT ROUTES //////////////////////////////
 // add appointment
@@ -67,7 +84,7 @@ export const getAppointment = async (appointmentID: string | number): Promise<Ap
   return response.json()
 };
 
-/////////////////////////// RESERVATION ROUTES ////////////////////////////
+/////////////////////////// RESERVATION ROUTES ////////////////////////////////
 
 // add reservation
 export const addReservation = async (user: ReservationData): Promise<void> => {
