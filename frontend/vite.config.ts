@@ -8,27 +8,27 @@ export default defineConfig({
     server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8001', // Backend server
+        target: 'http://localhost:8001', // Backend server
         changeOrigin: true, // Ensure the request appears to come from the frontend server
         //rewrite: (path) => path.replace(/^\/api/, ''), // Optional: Remove '/api' prefix
       },
       '/users': {
-        target: 'http://127.0.0.1:8001', // Backend server
+        target: 'http://localhost:8001', // Backend server
         changeOrigin: true, // Ensure the request appears to come from the frontend server
         //rewrite: (path) => path.replace(/^\/api/, ''), // Optional: Remove '/api' prefix
       },
         '/appointments': {
-        target: 'http://127.0.0.1:8001', // Backend server
+        target: 'http://localhost:8001', // Backend server
         changeOrigin: true, // Ensure the request appears to come from the frontend server
         //rewrite: (path) => path.replace(/^\/api/, ''), // Optional: Remove '/api' prefix
       },
         '/reservations': {
-        target: 'http://127.0.0.1:8001', // Backend server
+        target: 'http://localhost:8001', // Backend server
         changeOrigin: true, // Ensure the request appears to come from the frontend server
         //rewrite: (path) => path.replace(/^\/api/, ''), // Optional: Remove '/api' prefix
       },
         '/clinics': {
-        target: 'http://127.0.0.1:8001', // Backend server
+        target: 'http://localhost:8001', // Backend server
         changeOrigin: true, // Ensure the request appears to come from the frontend server
         //rewrite: (path) => path.replace(/^\/api/, ''), // Optional: Remove '/api' prefix
       },

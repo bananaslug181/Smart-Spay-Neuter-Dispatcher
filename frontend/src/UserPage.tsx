@@ -31,7 +31,12 @@ function UserPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+  const [first_name, setFirstName] = useState<UserData | null>(null);
+  const [last_name, setLastName] = useState<UserSession | null>(null);
+  const [email, setEmail] = useState<UserSession | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
+
     
   interface UserSession {
     login: boolean;
@@ -40,10 +45,6 @@ function UserPage() {
     email?: string;
   }
   
-  let first_name;
-  let last_name;
-  let email;
-  let isAuthenticated = false;
 
   // get the user, credit: https://testdriven.io/blog/flask-spa-auth/
   useEffect( () => {
@@ -57,10 +58,13 @@ function UserPage() {
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
-      alert(`Welcome, ${data.username}!`);
-      first_name = data.first_name,
-      last_name = data.last_name,
-      email = data.email
+      alert(`Welcome, ${data.first_name}!`);
+      setCurrentUser({
+        login: true,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -103,17 +107,19 @@ function UserPage() {
     .then((data: UserSession) => {
       console.log(data);
       if (data.login == true) {
-        isAuthenticated = true;
-        first_name = data.first_name,
-        last_name = data.last_name,
-        email = data.email
+      setCurrentUser({
+        login: true,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email
+      });
       } else {
-        isAuthenticated = false;
+        setIsAuthenticated: false;
         //csrf();
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.log("FAILED TO FETCH SESSION", err);
     });
   }, []);
 
@@ -160,7 +166,7 @@ function UserPage() {
             placeholder="Enter your first name"
           /> 
           */}
-          <p>First Name: {first_name}</p>
+          <p>First Name: {currentUser?.first_name}</p>
       </div>
       <div>
         {/*
@@ -171,7 +177,7 @@ function UserPage() {
           placeholder="Enter your last name" 
         />
         */}
-        <p>Last Name: {last_name}</p>
+        <p>Last Name: {currentUser?.last_name}</p>
       </div>
       <div>{/*
           <input 
@@ -181,7 +187,7 @@ function UserPage() {
             placeholder="Enter your email" 
           />
           */}
-          <p>Email: {email}</p>
+          <p>Email: {currentUser?.email}</p>
       </div>
       {/*
       <div>

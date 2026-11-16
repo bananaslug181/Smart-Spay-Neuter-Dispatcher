@@ -24,23 +24,23 @@ USER_NOT_FOUND = {"Error": "No user with this user_id exists"}
 RESERVATION_NOT_FOUND = {"Error": "No reservation with this reservation_id exists"}
 CLINICS = 'clinics'
 
+
 app = Flask(__name__)
 # load the key and ID from the enviornment
 load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 secret_key = os.getenv("CLIENT_SECRET")
-app.secret_key = os.getenv("APP-SECRET_KEY") # ?? just random?
-
+app.secret_key = os.getenv("APP_SECRET_KEY") # ?? just random?
+BACKEND_URL = os.getenv("BACKEND_URL")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 CORS(app, 
-     origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+     origins=[FRONTEND_URL],
      supports_credentials=True)
 
 client = datastore.Client()
 
 from flask import session
-
-app.config["SECRET_KEY"] = os.environ["APP_SECRET_KEY"]
 
 # credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 oauth = OAuth(app)
@@ -81,12 +81,12 @@ def login():
 @app.route("/api/data", methods=["GET"])
 #@login_required
 def user_data():
-    user = session.get('user_id')
+    user_id = session.get('user_id')
     #if user:
     return jsonify(
-        {"first_name": user["first_name"],
-        "last_name": user['last_name'],
-        'email': user['email']
+        {"first_name": session.get('first_name'),
+        "last_name": session.get('last_name'),
+        'email': session.get('email')
         })
     #return redirect('http://localhost:5173/login') # no user, log in instead?
 
@@ -121,7 +121,7 @@ def authorize():
     session['user_email'] = userinfo['email']
     session['first_name'] = userinfo.get('given_name')
     session['last_name'] = userinfo.get('family_name')
-    return redirect('http://localhost:5173/day') # redirect to the dayView page, TODO turn this into an env variable
+    return redirect(FRONTEND_URL + '/day') # redirect to the dayView page, TODO turn this into an env variable
 
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
@@ -136,7 +136,7 @@ def logout():
     session.permanent = True                       # respects PERMANENT_SESSION_LIFETIME
     #app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
     return redirect(
-        'http://localhost:5173/login' # TODO TURN THIS INTO A ENV VALUE
+        FRONTEND_URL + '/login'
     )
 
 # credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
