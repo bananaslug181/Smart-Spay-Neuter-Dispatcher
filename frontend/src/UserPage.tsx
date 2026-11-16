@@ -4,6 +4,7 @@ import {getUser} from './services/dispatcherAPI'
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { UserData } from './types/dispatcher'
+import { UserSession } from './types/dispatcher'
 import './index.css'
 const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VITE_API_URL?: string } }).env.VITE_API_URL || 'http://localhost:8001';
 
@@ -36,14 +37,6 @@ function UserPage() {
   const [email, setEmail] = useState<UserSession | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
-
-    
-  interface UserSession {
-    login: boolean;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-  }
   
 
   // get the user, credit: https://testdriven.io/blog/flask-spa-auth/

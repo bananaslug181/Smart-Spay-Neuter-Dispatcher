@@ -13,6 +13,13 @@ export interface UserData {
   //phone: string;
 }
 
+export interface UserSession {
+  login: boolean;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+}
+
 export interface ReservationData {
   id?: number;
   user_id: number;

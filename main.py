@@ -121,7 +121,7 @@ def authorize():
     session['user_email'] = userinfo['email']
     session['first_name'] = userinfo.get('given_name')
     session['last_name'] = userinfo.get('family_name')
-    return redirect(FRONTEND_URL + '/day') # redirect to the dayView page, TODO turn this into an env variable
+    return redirect(FRONTEND_URL + '/login') # redirect to the dayView page, TODO turn this into an env variable
 
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
