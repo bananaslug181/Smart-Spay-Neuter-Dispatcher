@@ -38,9 +38,8 @@ CORS(app,
      origins=[FRONTEND_URL],
      supports_credentials=True)
 
-client = datastore.Client()
+client = datastore.Client(project='smart-spay-neuter-dispatcher')
 
-from flask import session
 
 # credit https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 oauth = OAuth(app)
@@ -82,13 +81,13 @@ def login():
 #@login_required
 def user_data():
     user_id = session.get('user_id')
-    #if user:
-    return jsonify(
-        {"first_name": session.get('first_name'),
-        "last_name": session.get('last_name'),
-        'email': session.get('email')
-        })
-    #return redirect('http://localhost:5173/login') # no user, log in instead?
+    if user_id:
+        return jsonify(
+            {"first_name": session.get('first_name'),
+            "last_name": session.get('last_name'),
+            'email': session.get('email')
+            })
+    return redirect(FRONTEND_URL + '/login') # no user, log in instead?
 
 # credit: https://testdriven.io/blog/flask-spa-auth/ 
 @app.route("/api/getsession")
@@ -111,17 +110,23 @@ def authorize():
     userinfo = token['userinfo']
     session['user_id'] = userinfo['sub'] # sub = userid?
     # do something with the token and profile
-    # only make new user if arent already registered?
-    saved_user_key = client.key(USERS, session['user_id'])
-    if saved_user_key is None:
+    # see if user id is already registered?
+    saved_user_id_key = client.key(USERS, session['user_id'])
+    saved_user_id = client.get(saved_user_id_key)
+    if saved_user_id is None: # no user saved, store it in database
         new_key = client.key(USERS, userinfo['sub'])
         new_profile = datastore.Entity(key=new_key)
+        new_profile['user_email'] = userinfo['email']
+        new_profile['first_name'] = userinfo.get('given_name')
+        new_profile['last_name'] = userinfo.get('family_name')
         client.put(new_profile)
+    print(client.project)
+    print(client.get(client.key(USERS, '105634907246656913667')))
     # now whether or not user exists or not, gather their info from database?
     session['user_email'] = userinfo['email']
     session['first_name'] = userinfo.get('given_name')
     session['last_name'] = userinfo.get('family_name')
-    return redirect(FRONTEND_URL + '/login') # redirect to the dayView page, TODO turn this into an env variable
+    return redirect(FRONTEND_URL + '/profile') # redirect to the profile page
 
 
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
