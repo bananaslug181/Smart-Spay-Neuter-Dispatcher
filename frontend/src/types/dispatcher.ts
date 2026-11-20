@@ -1,6 +1,6 @@
 export interface AppointmentData {
-  id?: number;
-  clinic_id: number;
+  id?: string;
+  clinic_id: string;
   date: string;
 }
 

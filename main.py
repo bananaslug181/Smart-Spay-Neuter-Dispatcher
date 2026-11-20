@@ -165,7 +165,7 @@ def post_appointment():
     new_key = client.key(APPOINTMENTS)
     new_appointment = datastore.Entity(key=new_key)
     new_appointment.update({
-        'clinic_id': int(content['clinic_id']),
+        'clinic_id': str(content['clinic_id']),
         'date': content['date']
     })
     client.put(new_appointment)
