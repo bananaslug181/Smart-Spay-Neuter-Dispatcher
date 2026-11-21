@@ -199,9 +199,15 @@ def get_all_appointments(id):
     query = client.query(kind=APPOINTMENTS)
     query.add_filter(filter=PropertyFilter("clinic_id", "=", id))
     results = list(query.fetch())
+    events = [] # format for the calendar library in frontend to use
     for r in results:
         r['id'] = r.key.id
-    return results, 200
+        events.append({
+            "title": f"{r.get('slots_available', 0)}/{r.get('total_slots', 0)} slots available", # display like x/y slots available
+            "date": r['date']
+        })
+    return events, 200
+
 
 # EDIT AN APPOINTMENT
 @app.route('/' + APPOINTMENTS + '/<int:id>', methods=['PUT'])

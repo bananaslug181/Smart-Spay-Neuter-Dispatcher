@@ -34,7 +34,7 @@ function CalendarPage() {
   const [success, setSuccess] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
-  const [events, setEvents] = useState<UserSession[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [weekends, setWeekends] = useState(false);
 
 
@@ -102,7 +102,7 @@ function CalendarPage() {
       .then((res) => res.json())
       .then((data: UserData) => {
         console.log(data);
-        if (data.login == true) {
+        if (data.user_id) {
         setCurrentUser({
           login: true,
           user_id: data.user_id,
@@ -121,6 +121,9 @@ function CalendarPage() {
   // FETCH THE APPOINTMENTS
   // get the appointments, credit: https://testdriven.io/blog/flask-spa-auth/
   useEffect( () => {
+    // dont fetch until there is a user id to fetch with
+    if (!currentUser?.user_id) return;
+
     fetch(`${API_BASE_URL}/appointments/${currentUser?.user_id}`, {// could put this in dispatcherapi.ts
       method: "GET",
       headers: {
@@ -130,13 +133,13 @@ function CalendarPage() {
     })
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
+      console.log(data);      
       setEvents(data); // set the event array to the appointment data
     })
     .catch((err) => {
       console.log(err);
     });
-  }, []);
+  }, [currentUser]); // run again when there is a current user
 
 
   return (
@@ -204,6 +207,7 @@ function CalendarPage() {
         dayGridPlugin,
         listPlugin,
       ]}
+      events={events} // set it to my saved appointment data
       eventContent={renderEventContent}
       dateClick={handleDateClick}
       initialView="dayGridMonth"
@@ -221,10 +225,10 @@ function CalendarPage() {
         }
       }}
       //weekends={false}
-      events={[
-        { title: "event 1", date: "2019-04-01" },
-        { title: "event 2", date: "2019-04-02" },
-      ]}
+      //events={[
+       // { title: "event 1", date: "2019-04-01" },
+       // { title: "event 2", date: "2019-04-02" },
+      //]}
     />
   </>
 
