@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@fullcalendar/react": "^7.1.5",
+    "temporal-polyfill": "^1.0.8"
+  }
+}

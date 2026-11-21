@@ -3,3 +3,4 @@ google-cloud-datastore==2.23.0
 protobuf==6.33.6
 Authlib requests
 --save @fullcalendar/react temporal-polyfill
+@fullcalendar/react@latest temporal-polyfill@latest

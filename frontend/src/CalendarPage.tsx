@@ -14,9 +14,9 @@ import dayGridPlugin from "@fullcalendar/react/daygrid";
 import listPlugin from '@fullcalendar/react/list'
 
 // stylesheets
-//import '@fullcalendar/react/skeleton.css'; // ALWAYS NEED SKELETON
-//import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
-//import '@fullcalendar/react/themes/monarch/palettes/purple.css'; // YOUR THEME'S PALETTE
+import '@fullcalendar/react/skeleton.css'; // ALWAYS NEED SKELETON
+import '@fullcalendar/react/themes/monarch/theme.css'; // YOUR THEME
+import '@fullcalendar/react/themes/monarch/palettes/purple.css'; // YOUR THEME'S PALETTE
 //import { Calendar } from '@fullcalendar/react'
 
 
