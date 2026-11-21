@@ -1,5 +1,6 @@
 from datetime import datetime
 from google.cloud import datastore
+from google.cloud.datastore.query import PropertyFilter
 from flask import Flask, render_template
 from flask import Flask, render_template, request
 from flask import Flask
@@ -85,9 +86,11 @@ def user_data():
         return jsonify(
             {"first_name": session.get('first_name'),
             "last_name": session.get('last_name'),
-            'email': session.get('email')
+            'email': session.get('email'),
+            'user_id': user_id
             })
-    return redirect(FRONTEND_URL + '/login') # no user, log in instead?
+    else:
+        return redirect(FRONTEND_URL + '/login') # no user, log in instead?
 
 # credit: https://testdriven.io/blog/flask-spa-auth/ 
 @app.route("/api/getsession")
@@ -153,27 +156,35 @@ def logged_out():
 
 # references for following API requests: https://canvas.oregonstate.edu/courses/2061616/pages/exploration-crud-operations-in-datastore?module_item_id=27019561
 ############################## APPOINTMENTS ################################################
+
+# Note- each day has x many appointments all with the same check-in time.
+# id should be the clinicID + date, and only info that is needed is the check-in time and the appointment slot count
+
 # CREATE AN APPOINTMENT
 @app.route('/' + APPOINTMENTS, methods=["POST"])
 def post_appointment():
     content = request.get_json()
-    required_content=['clinic_id', 'date']
+    required_content=['clinic_id', 'date', 'time', 'total_slots', 'slots_available']
     # make sure body has all the content before attempting to add
     if body_has_content(content, required_content) is False:
         return REQUEST_MISSING_ATTRIBUTE, 400
     # make new key for database
-    new_key = client.key(APPOINTMENTS)
+    my_new_key = str(content['clinic_id']) + '+' + content['date'] # that way only one appointment cluster can exist per day?
+    new_key = client.key(APPOINTMENTS, my_new_key)
     new_appointment = datastore.Entity(key=new_key)
     new_appointment.update({
         'clinic_id': str(content['clinic_id']),
-        'date': content['date']
+        'date': content['date'],
+        'time': content['time'],
+        'total_slots': content['total_slots'],
+        'slots_available': content['slots_available']
     })
     client.put(new_appointment)
-    new_appointment['id'] = new_appointment.key.id
+    new_appointment['id'] = new_appointment.key.name # TODO: NEED TO DO THIS TO USER_ID AS WELL??? MANUALLY MAKE THE KEY BY NAME?
     return (new_appointment, 201)
 
 # GET AN APPOINTMENT
-@app.route('/' + APPOINTMENTS + '/<int:id>', methods=["GET"])
+@app.route('/' + 'appointment' + '/<string:id>', methods=["GET"])
 def get_appointment(id):
     appointment_key = client.key(APPOINTMENTS, id)
     appointment = client.get(appointment_key)
@@ -182,11 +193,15 @@ def get_appointment(id):
     appointment['id'] = appointment.key.id
     return appointment, 200
 
-# GET ALL APPOINTMENTS
-#@app.route('/' + APPOINTMENTS, methods=['GET'])
-#def get_all_appointments():
-    # POINTLESS, WILL NEVER USE???
-    pass
+# GET ALL APPOINTMENTS FOR A USER ID (works for either user or clinic currently cuz same id database)
+@app.route('/' + APPOINTMENTS + '/<string:id>', methods=['GET'])
+def get_all_appointments(id):
+    query = client.query(kind=APPOINTMENTS)
+    query.add_filter(filter=PropertyFilter("clinic_id", "=", id))
+    results = list(query.fetch())
+    for r in results:
+        r['id'] = r.key.id
+    return results, 200
 
 # EDIT AN APPOINTMENT
 @app.route('/' + APPOINTMENTS + '/<int:id>', methods=['PUT'])
@@ -204,7 +219,10 @@ def put_appointment(id):
     # it exists and has required content to edit
     appointment.update({
         'clinic_id': int(content['clinic_id']),
-        'date': content['date']
+        'date': content['date'],
+        'time': content['time'],
+        'total_slots': content['total_slots'],
+        'slots_available': content['slots_available']
     })
     client.put(appointment)
     appointment['id'] = appointment.key.id

@@ -76,7 +76,7 @@ export const addAppointment = async (user: AppointmentData): Promise<void> => {
 
 // get appointment
 export const getAppointment = async (appointmentID: string | number): Promise<AppointmentData> => {
-  const response = await fetch(`${API_BASE_URL}/appointments/${appointmentID}`);
+  const response = await fetch(`${API_BASE_URL}/appointment/${appointmentID}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Failed to get appointment' }));
     throw new Error(error.detail || `Error: ${response.statusText}`);

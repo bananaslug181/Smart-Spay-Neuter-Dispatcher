@@ -2,23 +2,28 @@ export interface AppointmentData {
   id?: string;
   clinic_id: string;
   date: string;
+  time: string;
+  total_slots: number;
+  slots_available: number;
 }
 
-export interface UserData {
-  id?: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  //address: string;
-  //phone: string;
-}
 
 export interface UserSession {
   login: boolean;
   first_name?: string;
   last_name?: string;
   email?: string;
+  user_id?: string;
 }
+
+export interface UserData {
+  login: boolean;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  user_id?: string;
+}
+
 
 export interface ReservationData {
   id?: number;

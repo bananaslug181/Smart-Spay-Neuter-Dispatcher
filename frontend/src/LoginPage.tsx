@@ -8,14 +8,11 @@ function LoginPage() {
     <>
         <html>
         <head>
-        <title>OAuth Example</title>
+        <title>Login with OAuth2.0</title>
         </head>
         <body>
-
-            <h1>OAuth Example</h1>
-
+            <h1>Login</h1>
             <h2>Click the button to authenticate</h2>
-
             <form method="POST">
                 <a href={`${API_BASE_URL}/login`}>Log in with Google</a>
             </form>

@@ -10,23 +10,6 @@ const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VIT
 
 function UserPage() {
 
-  /*
-  const [formData, setFormData] = useState<UserData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    address: '',
-    phone: ''
-  });
-  // get the user ID from the URL- don't need this cuz using credentials + sessions?
-  const {userID} = useParams<{userID: string}>();
-  const [first_name, setFirstName] = useState<string>('');
-  const [last_name, setLastName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  */
-
   // set the states
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,7 +34,6 @@ function UserPage() {
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
-      alert(`Welcome, ${data.first_name}!`);
       setCurrentUser({
         login: true,
         first_name: data.first_name,
@@ -63,32 +45,6 @@ function UserPage() {
       console.log(err);
     });
   }, []);
-
-
-  // reference: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/ 
-  // SET STUFF
-  /*
-  const handleFirstNameChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setFirstName(e.target.value);
-      };
-  const handleLastNameChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setLastName(e.target.value);
-      };
-  const handleAddressChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setAddress(e.target.value);
-      };
-  const handlePhoneChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setPhone(e.target.value);
-      };
-  const handleEmailChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setEmail(e.target.value);
-      };
-    */
 
 
   // credit: https://testdriven.io/blog/flask-spa-auth/
@@ -116,27 +72,6 @@ function UserPage() {
     });
   }, []);
 
-  // ADD USER
-  //const handleUpload = async (e: React.FormEvent) => {
-  //  e.preventDefault(); // prevent page reloading
-  //  setError(null);
-  //  setSuccess(false);
-  //  setIsEditing(true); 
-
-  //  const payload: UserData = {first_name, last_name, phone, email, address}
-
-  //  try {
-      // send the to the backend
-  //    const newUserData = await addUser(payload);
-  //    setCurrentUser(newUserData);
-  //    setSuccess(true);
-      // return user to the GET User page
-      //fetchUser();
-  //  } catch (error) {
-  //    setError("Failed to upload user data.");
-  //  }
-  //};
-
   
   return (
     // reference: https://www.w3schools.com/css/css_navbar.asp 
@@ -145,69 +80,21 @@ function UserPage() {
       <ul className="nav-links">
         <li><Link to="/">Day View</Link></li>
         <li><Link to="/calendar">Calendar</Link></li>
-        <li><Link to="/users">Profile</Link></li>
+        <li><Link to="/profile">Profile</Link></li>
       </ul>
     </nav>
     
-    <form> {/*onSubmit={handleUpload}>*/}
+    <form>
       <h1>View Your Profile</h1>
-      <div>{/*
-          <input 
-            type="text" 
-            value={first_name} 
-            onChange={handleFirstNameChange} 
-            placeholder="Enter your first name"
-          /> 
-          */}
+      <div>
           <p>First Name: {currentUser?.first_name}</p>
       </div>
       <div>
-        {/*
-        <input 
-          type="text" 
-          value={last_name} 
-          onChange={handleLastNameChange} 
-          placeholder="Enter your last name" 
-        />
-        */}
         <p>Last Name: {currentUser?.last_name}</p>
       </div>
-      <div>{/*
-          <input 
-            type="text" 
-            value={email} 
-            onChange={handleEmailChange} 
-            placeholder="Enter your email" 
-          />
-          */}
+      <div>
           <p>Email: {currentUser?.email}</p>
       </div>
-      {/*
-      <div>
-        
-          <input 
-            type="text" 
-            value={address} 
-            onChange={handleAddressChange} 
-            placeholder="Enter your address" 
-          />
-          
-          <p>Address: {address}</p>
-      </div>
-      
-    <div>
-        <input 
-          type="text" 
-          value={phone} 
-          onChange={handlePhoneChange} 
-          placeholder="Enter your phone" 
-        />
-        <p>Phone: {phone}</p>
-    </div>
-    <button type="submit">
-        Submit
-    </button>
-    */}
     </form>
     </>
   );
