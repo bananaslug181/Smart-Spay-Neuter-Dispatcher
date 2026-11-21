@@ -24,7 +24,6 @@ const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VIT
 function CalendarPage() {
   // get the user ID from the URL
   //const {userID} = useParams<{userID: string}>();
-  const [clinic_id, setClinicId] = useState<string>('');
   const [time, setTime] = useState<string>('');
   const [total_slots, setTotalSlots] = useState<number>(0);
   const [slots_available, setSlotsAvailable] = useState<number>(0);
@@ -40,10 +39,6 @@ function CalendarPage() {
 
   // reference: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/ 
   // HANDLE CHANGES
-  const handleClinicIdChange = 
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-          setClinicId(e.target.value);
-      };
   const handleDateChange = 
       (e: React.ChangeEvent<HTMLInputElement>) => {
           setDate(e.target.value);
@@ -66,7 +61,7 @@ function CalendarPage() {
     setIsEditing(true); 
 
     const payload: AppointmentData = {
-      clinic_id: clinic_id, 
+      clinic_id: currentUser?.user_id ?? '', // the clinic id is just the user_id, cuz only clinics are allowed to allocate appointments 
       date: date,
       time: time,
       total_slots: total_slots,
@@ -154,42 +149,33 @@ function CalendarPage() {
     </nav>
 
     <form onSubmit={handleUpload}>
-      <h1>Schedule Appointment</h1>
+      <h1>Allocate Appointments</h1>
       <div>
-        <input 
-          type="text" 
-          value={clinic_id} 
-          onChange={handleClinicIdChange} 
-          placeholder="Enter the Clinic's ID" 
-        />
-        <p>Clinic ID: {clinic_id}</p>
-      </div>
-      <div>
+        <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
         <input 
           type="text" 
           value={date} 
           onChange={handleDateChange} 
-          placeholder="Enter the date in yyyy-mm-dd format (with dashes)" 
+          placeholder="Enter the date" 
         />
-        <p>Date: {date}</p>
       </div>
       <div>
+        <p>Time- (Enter the time in 00:00 military time format): {time}</p>
         <input 
           type="text" 
           value={time} 
           onChange={handleTimeChange} 
-          placeholder="Enter the time in 00:00 military time format" 
+          placeholder="Enter the time" 
         />
-        <p>Time: {time}</p>
       </div>
       <div>
+        <p>Total Slots: {total_slots}</p>
         <input 
           type="text" 
           value={total_slots} 
           onChange={handleTotalSlotsChange} 
           placeholder="Enter the total appointment slot amount" 
         />
-        <p>Total Slots: {total_slots}</p>
       </div>
     <button type="submit">
         Submit</button>
