@@ -14,6 +14,7 @@ export interface UserSession {
   last_name?: string;
   email?: string;
   user_id?: string;
+  role?: string;
 }
 
 export interface UserData {

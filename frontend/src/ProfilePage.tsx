@@ -8,7 +8,7 @@ import { UserSession } from './types/dispatcher'
 import './index.css'
 const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VITE_API_URL?: string } }).env.VITE_API_URL || 'http://localhost:8001';
 
-function UserPage() {
+function ProfilePage() {
 
   // set the states
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,8 @@ function UserPage() {
   const [email, setEmail] = useState<UserSession | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
-  
+  const [clinicAccount, setClinicAccount] = useState(false);
+  const [clientAccount, setClientAccount] = useState(false);
 
   // get the user, credit: https://testdriven.io/blog/flask-spa-auth/
   useEffect( () => {
@@ -38,7 +39,8 @@ function UserPage() {
         login: true,
         first_name: data.first_name,
         last_name: data.last_name,
-        email: data.email
+        email: data.email,
+        role: data.role
       });
     })
     .catch((err) => {
@@ -76,16 +78,19 @@ function UserPage() {
   return (
     // reference: https://www.w3schools.com/css/css_navbar.asp 
     <>
+
     <nav className="navbar">
       <ul className="nav-links">
-        <li><Link to="/">Day View</Link></li>
+        <li><Link to="/day">Day View</Link></li>
         <li><Link to="/calendar">Calendar</Link></li>
         <li><Link to="/profile">Profile</Link></li>
       </ul>
     </nav>
     
+    {currentUser?.role == 'client' ?(
     <form>
       <h1>View Your Profile</h1>
+      <h2>Registered as a Client</h2>
       <div>
           <p>First Name: {currentUser?.first_name}</p>
       </div>
@@ -96,7 +101,24 @@ function UserPage() {
           <p>Email: {currentUser?.email}</p>
       </div>
     </form>
+
+    ) : (
+    <form>
+      <h1>View Your Profile</h1>
+      <h2>Registered as a Clinic</h2>
+      <div>
+          <p>First Name: {currentUser?.first_name}</p>
+      </div>
+      <div>
+        <p>Last Name: {currentUser?.last_name}</p>
+      </div>
+      <div>
+          <p>Email: {currentUser?.email}</p>
+      </div>
+    </form>
+    )
+  }
     </>
   );
 }
-export default UserPage;
+export default ProfilePage;

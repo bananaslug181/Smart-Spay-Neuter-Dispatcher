@@ -35,6 +35,7 @@ app.secret_key = os.getenv("APP_SECRET_KEY") # ?? just random?
 BACKEND_URL = os.getenv("BACKEND_URL")
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
+
 CORS(app, 
      origins=[FRONTEND_URL],
      supports_credentials=True)
@@ -74,6 +75,8 @@ app.config.update(
 # credit: https://docs.authlib.org/en/stable/oauth2/client/web/flask.html
 @app.route('/login')
 def login():
+    role = request.args.get('role')
+    session['role'] = role
     redirect_uri = url_for('authorize', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -87,7 +90,8 @@ def user_data():
             {"first_name": session.get('first_name'),
             "last_name": session.get('last_name'),
             'email': session.get('email'),
-            'user_id': user_id
+            'user_id': user_id,
+            'role': session.get('role')
             })
     else:
         return redirect(FRONTEND_URL + '/login') # no user, log in instead?
@@ -183,6 +187,7 @@ def post_appointment():
     new_appointment['id'] = new_appointment.key.name # TODO: NEED TO DO THIS TO USER_ID AS WELL??? MANUALLY MAKE THE KEY BY NAME?
     return (new_appointment, 201)
 
+
 # GET AN APPOINTMENT
 @app.route('/' + 'appointment' + '/<string:id>', methods=["GET"])
 def get_appointment(id):
@@ -192,6 +197,7 @@ def get_appointment(id):
         return APPOINTMENT_NOT_FOUND, 404
     appointment['id'] = appointment.key.id
     return appointment, 200
+
 
 # GET ALL APPOINTMENTS FOR A USER ID (works for either user or clinic currently cuz same id database)
 @app.route('/' + APPOINTMENTS + '/<string:id>', methods=['GET'])
@@ -203,7 +209,7 @@ def get_all_appointments(id):
     for r in results:
         r['id'] = r.key.id
         events.append({
-            "title": f"{r.get('slots_available', 0)}/{r.get('total_slots', 0)} slots available", # display like x/y slots available
+            "title": f"{r.get('slots_available', 0)}/{r.get('total_slots', 0)} slots available,\nTime: {r.get('time')}", # display like x/y slots available
             "date": r['date']
         })
     return events, 200
@@ -234,6 +240,7 @@ def put_appointment(id):
     appointment['id'] = appointment.key.id
     return appointment, 200
 
+
 # DELETE AN APPOINTMENT
 @app.route('/' + APPOINTMENTS + '/<int:id>', methods=['DELETE'])
 def delete_appointment(id):
@@ -250,7 +257,7 @@ def delete_appointment(id):
 @app.route('/' + USERS, methods=["POST"])
 def create_user():
     content = request.get_json()
-    required_content = ['first_name', 'last_name', 'email', 'phone', 'address']
+    required_content = ['first_name', 'last_name', 'email', 'phone', 'address', 'role']
     # make sure body has all the content before attempting to add
     if body_has_content(content, required_content) is False:
         return REQUEST_MISSING_ATTRIBUTE, 400
@@ -262,11 +269,11 @@ def create_user():
         'last_name': content['last_name'],
         'email': content['email'],
         'phone': content['phone'],
-        'address': content['address']
+        'address': content['address'],
+        'role': content['role']
     })
     client.put(new_user)
     new_user['id'] = new_user.key.id
-    print(f"INSIDE CREATE A USER FUNCTION!!!!!!!!!!!!!!!!!!!!! id: {new_user['id']}\n")
     return (new_user, 201)
 
 # GET A USER
@@ -307,7 +314,8 @@ def put_user(id):
         'last_name': content['last_name'],
         'email': content['email'],
         'phone': content['phone'],
-        'address': content['address']
+        'address': content['address'],
+        'role': content['role']
     })
     client.put(user)
     user['id'] = user.key.id
@@ -424,4 +432,4 @@ def body_has_content(content, required_content):
 
 if __name__ == "__main__":
     # only for local running
-    app.run(host="127.0.0.1", port=8001, debug=True)
+    app.run(host="127.0.0.1", port=8001, debug=True, use_reloader=False)

@@ -103,7 +103,7 @@ function CalendarPage() {
           user_id: data.user_id,
         });
         } else {
-          setIsAuthenticated: false;
+          setIsAuthenticated: false; // TODO should be ()?
           //csrf();
         }
       })
@@ -142,11 +142,13 @@ function CalendarPage() {
   <>
     <nav className="navbar">
       <ul className="nav-links">
-        <li><Link to="/">Day View</Link></li>
+        <li><Link to="/day">Day View</Link></li>
         <li><Link to="/calendar">Calendar</Link></li>
         <li><Link to="/profile">Profile</Link></li>
       </ul>
     </nav>
+
+    {currentUser?.role == 'client' ?(
 
     <form onSubmit={handleUpload}>
       <h1>Allocate Appointments</h1>
@@ -181,10 +183,37 @@ function CalendarPage() {
         Submit</button>
     </form>
       
-    <button onClick={() => setWeekends(!weekends)}>
-      toggle weekends
-    </button>
-    
+    ) : (
+    //<button onClick={() => setWeekends(!weekends)}>
+      //toggle weekends
+    //</button>
+
+    <form onSubmit={handleUpload}>
+      <h1>Schedule an Appointment</h1>
+      <div>
+        <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
+        <input 
+          type="text" 
+          value={date} 
+          onChange={handleDateChange} 
+          placeholder="Enter the date" 
+        />
+      </div>
+      <div>
+        <p>Time- (Enter the time in 00:00 military time format): {time}</p>
+        <input 
+          type="text" 
+          value={time} 
+          onChange={handleTimeChange} 
+          placeholder="Enter the time" 
+        />
+      </div>
+    <button type="submit">
+        Submit</button>
+    </form>
+
+    )}
+
     <FullCalendar
       // credit: https://fullcalendar.io/docs/react
       colorScheme='dark'
@@ -202,7 +231,7 @@ function CalendarPage() {
         end: 'dayGridMonth,dayGridWeek,listWeek',
       }}
       weekends={weekends}
-            buttons={{
+      buttons={{
         add: {
           text: 'Add Event',
           click() {
@@ -216,8 +245,7 @@ function CalendarPage() {
        // { title: "event 2", date: "2019-04-02" },
       //]}
     />
-  </>
-
+  </>    
   );
 }
 export default CalendarPage;

@@ -3,20 +3,27 @@ const API_BASE_URL = (import.meta as ImportMeta & { readonly env: { readonly VIT
 
 function LoginPage() {
 
+    const handleLoginRedirect = (role: 'client' | 'clinic') => {
+         window.location.href = `${API_BASE_URL}/login?role=${role}`;
+    };
+
     // direct the user to the login route on backend when clicked?
     return (
     <>
         <html>
         <head>
-        <title>Login with OAuth2.0</title>
+            <title>Login with OAuth2.0</title>
         </head>
         <body>
-            <h1>Login</h1>
-            <h2>Click the button to authenticate</h2>
-            <form method="POST">
-                <a href={`${API_BASE_URL}/login`}>Log in with Google</a>
-            </form>
-
+            <h1>Login/Register</h1>
+            <button onClick={() =>
+                handleLoginRedirect('client')}>
+            Login as a Client
+            </button>
+            <button onClick={() =>
+                handleLoginRedirect('clinic')}>
+            Login as a Clinic
+            </button>
         </body>
         </html>
     </>

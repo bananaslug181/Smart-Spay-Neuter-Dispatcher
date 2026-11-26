@@ -150,9 +150,9 @@ function DayPage() {
     <>
     <nav className="navbar">
       <ul className="nav-links">
-        <li><Link to="/">Day View</Link></li>
+        <li><Link to="/day">Day View</Link></li>
         <li><Link to="/calendar">Calendar</Link></li>
-        <li><Link to="/users">Profile</Link></li>
+        <li><Link to="/profile">Profile</Link></li>
       </ul>
     </nav>
     
