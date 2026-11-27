@@ -23,26 +23,24 @@ export interface UserData {
   last_name?: string;
   email?: string;
   user_id?: string;
+  role?: string;
 }
 
 
 export interface ReservationData {
   id?: number;
   user_id: number;
-  clinic_id: string;
-  appointment_id: string;
+  appointment_id: string | null;
   patient_details: PatientDetails;
-  date: string;
-  time: string;
   status?: string;
 }
 
 export interface PatientDetails {
-    name: string;
-    gender: string;
-    months_old: number;
-    underweight: boolean;
-    ear_tipped: boolean;
-    long_distance_travel: number;
-    distance_from_clinic: number;
+    name: string | null;
+    gender: string | null;
+    months_old: number | null;
+    underweight: boolean | null;
+    ear_tipped: boolean | null;
+    long_distance_travel: number | null;
+    distance_from_clinic: number | null;
 }

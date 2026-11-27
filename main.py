@@ -345,11 +345,11 @@ def create_reservation():
     new_reservation = datastore.Entity(key=new_key)
     new_reservation.update({
         'user_id': int(content['user_id']),
-        'clinic_id': int(content['clinic_id']),
+        #'clinic_id': int(content['clinic_id']),
         'appointment_id': int(content['appointment_id']),
         'patient_details': content['patient_details'],
-        'date': content['date'],
-        'time': content['time']
+        #'date': content['date'],
+        #'time': content['time']
     })
     client.put(new_reservation)
     new_reservation['id'] = new_reservation.key.id

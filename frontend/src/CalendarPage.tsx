@@ -1,11 +1,19 @@
 //import { editAppointment } from './services/dispatcherAPI'
-import { addAppointment } from './services/dispatcherAPI'
+import { addAppointment, addReservation } from './services/dispatcherAPI'
 import {getAppointment} from './services/dispatcherAPI'
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AppointmentData } from './types/dispatcher'
+import { AppointmentData, ReservationData } from './types/dispatcher'
 import { UserSession, UserData } from './types/dispatcher'
 import FullCalendar from "@fullcalendar/react";
+import {
+  EventApi,
+  DateSelectInfo,
+  EventClickInfo,
+  EventDisplayInfo,
+  formatDate,
+} from '@fullcalendar/react'
+
 import './index.css'
 //import themePlugin from "@fullcalendar/themes/monarch"; // YOUR THEME
 
@@ -51,8 +59,7 @@ function CalendarPage() {
       (e: React.ChangeEvent<HTMLInputElement>) => {
           setTotalSlots(Number(e.target.value));
       };
-
-
+  
   // ADD APPOINTMENT
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault(); // prevent page reloading
@@ -75,6 +82,36 @@ function CalendarPage() {
         setError("Failed to create new appointment.");
       }
   };
+
+  // ADD RESERVATION
+  const handleReservation = async (e: React.FormEvent) => {
+    e.preventDefault(); // prevent page reloading
+    setError(null);
+    setSuccess(false);
+    setIsEditing(true); 
+
+    const payload: ReservationData = {
+      user_id: Number(currentUser?.user_id ?? ''),
+      appointment_id: null,
+      patient_details: {
+        'name': 'Unnamed',
+        'distance_from_clinic': null,
+        'ear_tipped': null,
+        'gender': null,
+        'long_distance_travel': null,
+        'months_old': null,
+        'underweight': null,
+      },
+      status: ''
+      }
+      try {
+        // send the to the backend
+        const newReservationData = await addReservation(payload);
+        // TODO: append the new data??
+      } catch (error) {
+        setError("Failed to create new reservation.");
+      }
+  };
   
   const handleDateClick = (info: { dateStr: string }) => {
       alert(info.dateStr);
@@ -88,7 +125,6 @@ function CalendarPage() {
   );
   
   /// GET THE CURRENT USER
-  
     // credit: https://testdriven.io/blog/flask-spa-auth/
     useEffect(() => {
       fetch(`${API_BASE_URL}/api/data`, { // could put this in dispatcherapi.ts
@@ -101,6 +137,7 @@ function CalendarPage() {
         setCurrentUser({
           login: true,
           user_id: data.user_id,
+          role: data.role
         });
         } else {
           setIsAuthenticated: false; // TODO should be ()?
@@ -137,6 +174,13 @@ function CalendarPage() {
   }, [currentUser]); // run again when there is a current user
 
 
+  // credit: https://github.com/fullcalendar/fullcalendar-examples/blob/main/react19/src/DemoApp.tsx 
+  function handleEventClick(clickInfo: EventClickInfo) {
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+      clickInfo.event.remove()
+    }
+  }
+  
   return (
     // reference: https://www.w3schools.com/css/css_navbar.asp 
   <>
@@ -147,11 +191,38 @@ function CalendarPage() {
         <li><Link to="/profile">Profile</Link></li>
       </ul>
     </nav>
-
+  
     {currentUser?.role == 'client' ?(
-
     <form onSubmit={handleUpload}>
-      <h1>Allocate Appointments</h1>
+      <h1>Reserve an Appointment Slot</h1>
+      <div>
+        <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
+        <input 
+          type="text" 
+          value={date} 
+          onChange={handleDateChange} 
+          placeholder="Enter the date" 
+        />
+      </div>
+      <div>
+        <p>Time- (Enter the time in 00:00 military time format): {time}</p>
+        <input 
+          type="text" 
+          value={time} 
+          onChange={handleTimeChange} 
+          placeholder="Enter the time" 
+        />
+      </div>
+    <button type="submit">
+        Submit</button>
+    </form>
+      
+    ) : (
+    //<button onClick={() => setWeekends(!weekends)}>
+      //toggle weekends
+    //</button>
+    <form onSubmit={handleUpload}>
+      <h1>Allocate Appointment Slots</h1>
       <div>
         <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
         <input 
@@ -182,36 +253,6 @@ function CalendarPage() {
     <button type="submit">
         Submit</button>
     </form>
-      
-    ) : (
-    //<button onClick={() => setWeekends(!weekends)}>
-      //toggle weekends
-    //</button>
-
-    <form onSubmit={handleUpload}>
-      <h1>Schedule an Appointment</h1>
-      <div>
-        <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
-        <input 
-          type="text" 
-          value={date} 
-          onChange={handleDateChange} 
-          placeholder="Enter the date" 
-        />
-      </div>
-      <div>
-        <p>Time- (Enter the time in 00:00 military time format): {time}</p>
-        <input 
-          type="text" 
-          value={time} 
-          onChange={handleTimeChange} 
-          placeholder="Enter the time" 
-        />
-      </div>
-    <button type="submit">
-        Submit</button>
-    </form>
-
     )}
 
     <FullCalendar
@@ -222,7 +263,8 @@ function CalendarPage() {
         dayGridPlugin,
         listPlugin,
       ]}
-      events={events} // set it to my saved appointment data
+      events={events} 
+      // set it to my saved appointment data
       eventContent={renderEventContent}
       dateClick={handleDateClick}
       initialView="dayGridMonth"
@@ -239,13 +281,14 @@ function CalendarPage() {
           },
         }
       }}
+      eventClick={handleEventClick}
       //weekends={false}
       //events={[
        // { title: "event 1", date: "2019-04-01" },
        // { title: "event 2", date: "2019-04-02" },
       //]}
     />
-  </>    
+  </>
   );
 }
 export default CalendarPage;
