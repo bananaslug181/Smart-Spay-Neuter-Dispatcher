@@ -45,7 +45,7 @@ function CalendarPage() {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [weekends, setWeekends] = useState(true);
-
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string>('')
 
   // reference: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/ 
   // HANDLE APPOINTMENT DATA CHANGES
@@ -85,37 +85,6 @@ function CalendarPage() {
       }
   };
 
-
-
-  // ADD RESERVATION
-  const handleReservation = async (e: React.FormEvent) => {
-    e.preventDefault(); // prevent page reloading
-    setError(null);
-    setSuccess(false);
-    setIsEditing(true); 
-
-    const payload: ReservationData = {
-      user_id: Number(currentUser?.user_id ?? ''),
-      appointment_id: null,
-      patient_details: {
-        'name': 'Unnamed',
-        'distance_from_clinic': null,
-        'ear_tipped': null,
-        'gender': null,
-        'long_distance_travel': null,
-        'age': null,
-        'underweight': null,
-      },
-      status: ''
-      }
-      try {
-        // send the to the backend
-        const newReservationData = await addReservation(payload);
-        // TODO: append the new data??
-      } catch (error) {
-        setError("Failed to create new reservation.");
-      }
-  };
   
   const handleDateClick = (info: { dateStr: string }) => {
       alert(info.dateStr);
@@ -129,16 +98,20 @@ function CalendarPage() {
   );
   
 
-  // RESERVATION SCHEDULE POPUP
+  // RESERVATION MODAL SCHEDULE POPUP
   // credit: https://dev.to/theedgebreaker/creating-a-simple-modal-component-in-react-with-typescript-for-beginners-42ac 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const handleShowModal = () => {
-    setIsModalVisible(true);
-  };
+  
   const handleCloseModal = () => {
     setIsModalVisible(false);
   };
 
+    // credit: https://github.com/fullcalendar/fullcalendar-examples/blob/main/react19/src/DemoApp.tsx 
+  function handleClickModal(clickInfo: EventClickInfo) {
+    setIsModalVisible(true);
+    setSelectedAppointmentId(clickInfo.event.id) // set selected appointment id
+    console.log("SELECTED EVENT APPOINTMENT ID: ", selectedAppointmentId)
+  }
 
   /// GET THE CURRENT USER
     // credit: https://testdriven.io/blog/flask-spa-auth/
@@ -190,16 +163,6 @@ function CalendarPage() {
   }, [currentUser]); // run again when there is a current user
 
 
-  // credit: https://github.com/fullcalendar/fullcalendar-examples/blob/main/react19/src/DemoApp.tsx 
-  function handleEventClick(clickInfo: EventClickInfo) {
-    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      console.log("EVENT ID: ", clickInfo.event.id)
-      //clickInfo.event.remove()
-      // open up a reservation window/page/popup 
-    }
-  }
-
-
   return (
     // references: https://www.w3schools.com/css/css_navbar.asp
     // https://dev.to/theedgebreaker/creating-a-simple-modal-component-in-react-with-typescript-for-beginners-42ac
@@ -213,9 +176,15 @@ function CalendarPage() {
     </nav>
   
     {currentUser?.role == 'client' ?(
-    <form onSubmit={handleUpload}>
+    <>
     <div className="relative"> 
-      {isModalVisible && <ModalBox onClose={handleCloseModal} />}
+      {isModalVisible && (
+        <ModalBox 
+          onClose={handleCloseModal} 
+          userID={currentUser.user_id ?? ''}
+          selectedAppointmentId={selectedAppointmentId}
+          />
+        )}
     </div>
     
     <FullCalendar
@@ -244,13 +213,12 @@ function CalendarPage() {
           },
         }
       }}
-      eventClick={handleShowModal} // was handleEventClick
+      eventClick={
+        handleClickModal // was handleEventClick
+      } 
       //weekends={false}
     />
-    
-    <button type="submit">
-        Submit</button>
-    </form>
+    </>
       
     ) : (
     //<button onClick={() => setWeekends(!weekends)}>

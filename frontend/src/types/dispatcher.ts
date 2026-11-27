@@ -29,18 +29,18 @@ export interface UserData {
 
 export interface ReservationData {
   id?: number;
-  user_id: number;
-  appointment_id: string | null;
+  user_id: string;
+  appointment_id: string;
   patient_details: PatientDetails;
   status?: string;
 }
 
 export interface PatientDetails {
-    name: string | null;
-    gender: string | null;
-    age: number | null;
-    underweight: boolean | null;
-    ear_tipped: boolean | null;
-    long_distance_travel: number | null;
-    distance_from_clinic: number | null;
+    name: string;
+    gender: string;
+    age: number;
+    underweight: string; // todo CHANGE THESE TO BOOLEANS LATER
+    ear_tipped: string;
+    long_distance_travel: string;
+    distance_from_clinic: number;
 }

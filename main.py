@@ -338,22 +338,22 @@ def delete_user(id):
 @app.route('/' + RESERVATIONS, methods = ["POST"])
 def create_reservation():
     content = request.get_json()
-    required_content = ['user_id', 'clinic_id', 'appointment_id', 'patient_details', 'date', 'time']
+    required_content = ['user_id', 'appointment_id', 'patient_details']
     # make sure body has content before adding
     if body_has_content(content, required_content) is False:
         return REQUEST_MISSING_ATTRIBUTE, 400
+    # TODO check that patient_details also has content
     new_key = client.key(RESERVATIONS)
     new_reservation = datastore.Entity(key=new_key)
     new_reservation.update({
-        'user_id': int(content['user_id']),
-        #'clinic_id': int(content['clinic_id']),
-        'appointment_id': int(content['appointment_id']),
+        'user_id': content['user_id'],
+        'appointment_id': content['appointment_id'],
         'patient_details': content['patient_details'],
-        #'date': content['date'],
-        #'time': content['time']
     })
     client.put(new_reservation)
     new_reservation['id'] = new_reservation.key.id
+
+    # decrement the available appointment count TODO 
     return (new_reservation, 201)
 
 # GET A RESERVATION
