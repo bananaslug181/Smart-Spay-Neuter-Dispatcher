@@ -15,6 +15,7 @@ import {
   formatDate,
 } from '@fullcalendar/react'
 
+// @ts-expect-error
 import './index.css'
 //import themePlugin from "@fullcalendar/themes/monarch"; // YOUR THEME
 
@@ -232,20 +233,45 @@ function CalendarPage() {
       </div>
 
       <div className="relative"> 
-      <button
-        className="bg-green-600 hover:bg-green-500 transition duration-150
-      text-white px-5 py-2 rounded-md absolute top-4 left-8 transform"
-        onClick={handleShowModal}
-      >
-        Show Modal
-      </button>
       {isModalVisible && <ModalBox onClose={handleCloseModal} />}
     </div>
-
+    
+    <FullCalendar
+      // credit: https://fullcalendar.io/docs/react
+      colorScheme='dark'
+      plugins={[
+        themePlugin,
+        dayGridPlugin,
+        listPlugin,
+      ]}
+      events={events} 
+      // set it to my saved appointment data
+      eventContent={renderEventContent}
+      dateClick={handleDateClick} // TODO can do something with this instead of my way?
+      initialView="dayGridMonth"
+      headerToolbar={{
+        start: 'add today prev,next title',
+        end: 'dayGridMonth,dayGridWeek,listWeek',
+      }}
+      weekends={weekends}
+      buttons={{
+        add: {
+          text: 'Add Event',
+          click() {
+            alert('handle add event...')
+          },
+        }
+      }}
+      eventClick={handleShowModal} // was handleEventClick
+      //weekends={false}
+      //events={[
+       // { title: "event 1", date: "2019-04-01" },
+       // { title: "event 2", date: "2019-04-02" },
+      //]}
+    />
     <button type="submit">
         Submit</button>
     </form>
-    
       
     ) : (
     //<button onClick={() => setWeekends(!weekends)}>
@@ -280,22 +306,8 @@ function CalendarPage() {
           placeholder="Enter the total appointment slot amount" 
         />
       </div>
-    
-    <div className="relative"> 
-      <button
-        className="bg-green-600 hover:bg-green-500 transition duration-150
-      text-white px-5 py-2 rounded-md absolute top-4 left-8 transform"
-        onClick={handleShowModal}
-      >
-        Show Modal
-      </button>
-      {isModalVisible && <ModalBox onClose={handleCloseModal} />}
-    </div>
-
     <button type="submit">
         Submit</button>
-    </form>
-    )}
 
     <FullCalendar
       // credit: https://fullcalendar.io/docs/react
@@ -323,13 +335,15 @@ function CalendarPage() {
           },
         }
       }}
-      eventClick={handleEventClick}
+      //eventClick={handleShowModal} // was handleEventClick
       //weekends={false}
       //events={[
        // { title: "event 1", date: "2019-04-01" },
        // { title: "event 2", date: "2019-04-02" },
       //]}
     />
+    </form>
+    )}
   </>
   );
 }
