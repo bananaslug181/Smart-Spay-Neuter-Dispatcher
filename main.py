@@ -184,7 +184,7 @@ def post_appointment():
         'slots_available': content['slots_available']
     })
     client.put(new_appointment)
-    new_appointment['id'] = new_appointment.key.name # TODO: NEED TO DO THIS TO USER_ID AS WELL??? MANUALLY MAKE THE KEY BY NAME?
+    new_appointment['id'] = new_appointment.key.id
     return (new_appointment, 201)
 
 
@@ -208,7 +208,8 @@ def get_all_appointments(id):
     events = [] # format for the calendar library in frontend to use
     for r in results:
         r['id'] = r.key.id
-        events.append({
+        events.append({ # TODO: just send the data as results? No need for event array?
+            'id': r['id'],
             "title": f"{r.get('slots_available', 0)}/{r.get('total_slots', 0)} slots available,\nTime: {r.get('time')}", # display like x/y slots available
             "date": r['date']
         })

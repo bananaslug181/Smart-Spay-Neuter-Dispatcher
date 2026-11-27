@@ -77,7 +77,7 @@ function CalendarPage() {
       try {
         // send the to the backend
         const newAppointmentData = await addAppointment(payload);
-        // TODO: append the new data??
+        // TODO: append the new data?? to what? i forget - future me
       } catch (error) {
         setError("Failed to create new appointment.");
       }
@@ -165,7 +165,7 @@ function CalendarPage() {
     })
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);      
+      console.log("Event data: ", data);      
       setEvents(data); // set the event array to the appointment data
     })
     .catch((err) => {
@@ -177,9 +177,11 @@ function CalendarPage() {
   // credit: https://github.com/fullcalendar/fullcalendar-examples/blob/main/react19/src/DemoApp.tsx 
   function handleEventClick(clickInfo: EventClickInfo) {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+      console.log("EVENT ID: ", clickInfo.event.id)
       clickInfo.event.remove()
     }
   }
+  
   
   return (
     // reference: https://www.w3schools.com/css/css_navbar.asp 
@@ -266,7 +268,7 @@ function CalendarPage() {
       events={events} 
       // set it to my saved appointment data
       eventContent={renderEventContent}
-      dateClick={handleDateClick}
+      dateClick={handleDateClick} // TODO can do something with this instead of my way?
       initialView="dayGridMonth"
       headerToolbar={{
         start: 'add today prev,next title',
