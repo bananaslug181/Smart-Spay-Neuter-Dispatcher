@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router-dom'
 import { AppointmentData, ReservationData } from './types/dispatcher'
 import { UserSession, UserData } from './types/dispatcher'
 import FullCalendar from "@fullcalendar/react";
+import ModalBox from "./components/ModalBox";
 import {
   EventApi,
   DateSelectInfo,
@@ -42,7 +43,7 @@ function CalendarPage() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [events, setEvents] = useState<any[]>([]);
-  const [weekends, setWeekends] = useState(false);
+  const [weekends, setWeekends] = useState(true);
 
 
   // reference: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/ 
@@ -124,6 +125,18 @@ function CalendarPage() {
     </>
   );
   
+
+  // RESERVATION SCHEDULE POPUP
+  // credit: https://dev.to/theedgebreaker/creating-a-simple-modal-component-in-react-with-typescript-for-beginners-42ac 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const handleShowModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
+
+
   /// GET THE CURRENT USER
     // credit: https://testdriven.io/blog/flask-spa-auth/
     useEffect(() => {
@@ -178,13 +191,15 @@ function CalendarPage() {
   function handleEventClick(clickInfo: EventClickInfo) {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
       console.log("EVENT ID: ", clickInfo.event.id)
-      clickInfo.event.remove()
+      //clickInfo.event.remove()
+      // open up a reservation window/page/popup 
     }
   }
-  
-  
+
+
   return (
-    // reference: https://www.w3schools.com/css/css_navbar.asp 
+    // references: https://www.w3schools.com/css/css_navbar.asp
+    // https://dev.to/theedgebreaker/creating-a-simple-modal-component-in-react-with-typescript-for-beginners-42ac
   <>
     <nav className="navbar">
       <ul className="nav-links">
@@ -215,9 +230,22 @@ function CalendarPage() {
           placeholder="Enter the time" 
         />
       </div>
+
+      <div className="relative"> 
+      <button
+        className="bg-green-600 hover:bg-green-500 transition duration-150
+      text-white px-5 py-2 rounded-md absolute top-4 left-8 transform"
+        onClick={handleShowModal}
+      >
+        Show Modal
+      </button>
+      {isModalVisible && <ModalBox onClose={handleCloseModal} />}
+    </div>
+
     <button type="submit">
         Submit</button>
     </form>
+    
       
     ) : (
     //<button onClick={() => setWeekends(!weekends)}>
@@ -252,6 +280,18 @@ function CalendarPage() {
           placeholder="Enter the total appointment slot amount" 
         />
       </div>
+    
+    <div className="relative"> 
+      <button
+        className="bg-green-600 hover:bg-green-500 transition duration-150
+      text-white px-5 py-2 rounded-md absolute top-4 left-8 transform"
+        onClick={handleShowModal}
+      >
+        Show Modal
+      </button>
+      {isModalVisible && <ModalBox onClose={handleCloseModal} />}
+    </div>
+
     <button type="submit">
         Submit</button>
     </form>
