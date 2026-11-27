@@ -38,7 +38,7 @@ export interface ReservationData {
 export interface PatientDetails {
     name: string | null;
     gender: string | null;
-    months_old: number | null;
+    age: number | null;
     underweight: boolean | null;
     ear_tipped: boolean | null;
     long_distance_travel: number | null;

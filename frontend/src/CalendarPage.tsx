@@ -48,7 +48,7 @@ function CalendarPage() {
 
 
   // reference: https://www.geeksforgeeks.org/typescript/how-to-get-value-of-input-in-typescript/ 
-  // HANDLE CHANGES
+  // HANDLE APPOINTMENT DATA CHANGES
   const handleDateChange = 
       (e: React.ChangeEvent<HTMLInputElement>) => {
           setDate(e.target.value);
@@ -85,6 +85,8 @@ function CalendarPage() {
       }
   };
 
+
+
   // ADD RESERVATION
   const handleReservation = async (e: React.FormEvent) => {
     e.preventDefault(); // prevent page reloading
@@ -101,7 +103,7 @@ function CalendarPage() {
         'ear_tipped': null,
         'gender': null,
         'long_distance_travel': null,
-        'months_old': null,
+        'age': null,
         'underweight': null,
       },
       status: ''
@@ -212,27 +214,7 @@ function CalendarPage() {
   
     {currentUser?.role == 'client' ?(
     <form onSubmit={handleUpload}>
-      <h1>Reserve an Appointment Slot</h1>
-      <div>
-        <p>Date: (Enter the date in yyyy-mm-dd format (with dashes)): {date}</p>
-        <input 
-          type="text" 
-          value={date} 
-          onChange={handleDateChange} 
-          placeholder="Enter the date" 
-        />
-      </div>
-      <div>
-        <p>Time- (Enter the time in 00:00 military time format): {time}</p>
-        <input 
-          type="text" 
-          value={time} 
-          onChange={handleTimeChange} 
-          placeholder="Enter the time" 
-        />
-      </div>
-
-      <div className="relative"> 
+    <div className="relative"> 
       {isModalVisible && <ModalBox onClose={handleCloseModal} />}
     </div>
     
@@ -264,11 +246,8 @@ function CalendarPage() {
       }}
       eventClick={handleShowModal} // was handleEventClick
       //weekends={false}
-      //events={[
-       // { title: "event 1", date: "2019-04-01" },
-       // { title: "event 2", date: "2019-04-02" },
-      //]}
     />
+    
     <button type="submit">
         Submit</button>
     </form>
@@ -337,10 +316,6 @@ function CalendarPage() {
       }}
       //eventClick={handleShowModal} // was handleEventClick
       //weekends={false}
-      //events={[
-       // { title: "event 1", date: "2019-04-01" },
-       // { title: "event 2", date: "2019-04-02" },
-      //]}
     />
     </form>
     )}
