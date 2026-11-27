@@ -110,7 +110,6 @@ function CalendarPage() {
   function handleClickModal(clickInfo: EventClickInfo) {
     setIsModalVisible(true);
     setSelectedAppointmentId(clickInfo.event.id) // set selected appointment id
-    console.log("SELECTED EVENT APPOINTMENT ID: ", selectedAppointmentId)
   }
 
   /// GET THE CURRENT USER

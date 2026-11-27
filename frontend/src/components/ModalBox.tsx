@@ -90,6 +90,7 @@ interface ModalProps {
         try {
             // send the to the backend
             const newReservationData = await addReservation(payload);
+            onClose() // close the window after data sends
             // TODO: append the new data?? to what? i forget - future me
         } catch (error) {
             setError("Failed to create new reservation.");
